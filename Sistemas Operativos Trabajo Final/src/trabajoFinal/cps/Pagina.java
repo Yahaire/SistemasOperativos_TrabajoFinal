@@ -4,7 +4,7 @@ public class Pagina {
 	int iDirFisica; // Direcci√≥n de memoria f√≠sica donde se encuentra la p√°gina
 	boolean bSwap;		// Si esta p√°gina se encuentra en memoria Swap
 	int iDirSwap;	// Si bSwap est√° activo, direcci√≥n de Swap en la que se encuentra la p√°gina.
-	boolean bModificacion;	// Indica si ha habido alguna modificaci√≥n en la p√°gina.
+	boolean bModificado;	// Indica si ha habido alguna modificaci√≥n en la p√°gina.
 	
 	/*
 	 * Pagina
@@ -17,7 +17,7 @@ public class Pagina {
 		this.iDirFisica = iDirMemoria;
 		this.bSwap = false;
 		this.iDirSwap = -1;
-		this.bModificacion = false;
+		this.bModificado = false;
 	}
 	
 	/*
@@ -50,6 +50,50 @@ public class Pagina {
 	 * Activa el indicador de que esta p·gina ha sido modificada.
 	 */
 	public void modificar() {
-		this.bModificacion = true;
+		this.bModificado = true;
+	}
+	
+	/*
+	 * Get DirFisica
+	 * 
+	 * MÈtodo get de iDirFisica.
+	 * 
+	 * @return la direcciÛn <code>int</code> en memoria en donde est· guardada la p·gina si bSwap es false
+	 */
+	public int getDirFisica() {
+		return this.iDirFisica;
+	}
+	
+	/*
+	 * Get Swap
+	 * 
+	 * MÈtodo get de bSwap
+	 * 
+	 * @return <code>boolean</code> de si la p·gina se encuentra actualmente en memoria swap
+	 */
+	public boolean getbSwap() {
+		return this.bSwap;
+	}
+	
+	/*
+	 * Get DirSwap
+	 * 
+	 * MÈtodo get de iDirSwap
+	 * 
+	 * @return la direcciÛn <code>int</code> en memoria en donde est· guardada la p·gina si bSwap es false
+	 */
+	public int iDirSwap() {
+		return this.iDirSwap;
+	}
+	
+	/*
+	 * Get Modificado
+	 * 
+	 * MÈtodo get de bModificado
+	 * 
+	 * @return <code>boolean</code> de si la p·gina ha sido modificada
+	 */
+	public boolean getModificado() {
+		return this.bModificado;
 	}
 }
