@@ -69,7 +69,7 @@ public class Main {
 								&& !(insActual.sTipo.equals("E")) 
 								) {
 							ManejadorDeMemoria mdmSistemaOperativo = new ManejadorDeMemoria( 2048, 4096, 8 );
-							HashMap<Integer, Long> hsmTurnarounds;	// Contendrá los tiempos de turnaround de cada uno de los procesos (última vez que el proceso se cargó)
+							HashMap<Integer, Long> hsmTurnarounds = new HashMap<Integer, Long>();	// Contendrá los tiempos de turnaround de cada uno de los procesos (última vez que el proceso se cargó)
 							
 							
 							// Continuar hasta que se indique fin de sección de instrucciones
@@ -77,7 +77,7 @@ public class Main {
 								System.out.println( insActual.getInstruccion() );	// Mostrar instrucciones diferentes de F y E
 								
 								if ( insActual.sTipo.equals("P") ) {	// Cargar proceso
-									System.out.println("Asignar " + insActual.iValor1 + "bytes al proceso " + insActual.iValor2);
+									System.out.println("Asignar " + insActual.iValor1 + " bytes al proceso " + insActual.iValor2);
 									
 									ManejadorDeMemoria.ProccesoCargado cajaTemporal = mdmSistemaOperativo.cargarProceso(insActual.iValor1, insActual.iValor2);
 									
