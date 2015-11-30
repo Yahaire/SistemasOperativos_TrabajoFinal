@@ -13,7 +13,13 @@ public class ManejadorDeMemoria {
 	int iMarcosMemoria;
 	int iMarcosSwap;
 
-
+	/**
+	 * Inicializa los arreglos de objetos MarcoDePagina de memoria y de swap.
+	 *
+	 * @param int iTamMemoria es el tamaño total en bytes de la memoria del simulador.
+	 * @param int iTamMSap es el tamaño total en bytes del swap del simulador.
+	 * @param int iTamPagina es el tamaño bytes de los marcos de pagina del simulador.
+	 */
 	public ManejadorDeMemoria(int iTamMemoria, int iTamSwap, int iTamPagina){
 		this.iTamMemoria = iTamMemoria;
 		this.iTamSwap = iTamSwap;
@@ -24,7 +30,15 @@ public class ManejadorDeMemoria {
 		mdpMemoria = new MarcoDePagina[iMarcosMemoria];
 		mdpSwap = new MarcoDePagina[iMarcosSwap];
 	}
-
+	/**
+	 * Carga el proceso a Memoria. Carga el proceso agregando una
+	 * TablaDePaginacion a hsmTablasDePaginacion en la posicion iIDProceso.
+	 *
+	 * @param int iIDProceso es el ID del prcoceso a cargar.
+	 * @param int iTam es el tamaño en bytes del programa a cargar.
+	 *
+	 * @return bool Regresa si el programa se pudo cargar o no.
+	 */
 	//TODO: Mejorar el return para poder saber la razón por la que no se pudo cargar el programa a memoria
 	public boolean cargarProceso(int iIDProceso, int iTam){
 		Vector <Pagina> vecPaginas;
@@ -79,6 +93,11 @@ public class ManejadorDeMemoria {
 		return true;
 	}
 
+	/**
+	 * Contar la cantidad de marcos de página libres en memoria.
+	 *
+	 * @return int la cantidad de marcos de página libres en memoria.
+	 */
 	private int memoriaVacia(){
 		int contadorMarcosLibres = 0;
 		for(int i = 0; i < iMarcosMemoria; i++){
@@ -88,6 +107,12 @@ public class ManejadorDeMemoria {
 		}
 		return contadorMarcosLibres;
 	}
+
+	/**
+	 * Contar la cantidad de marcos de página libres en swap.
+	 *
+	 * @return int la cantidad de marcos de página libres en swap.
+	 */
 	private int swapVacio(){
 		int contadorMarcosLibres = 0;
 		for(int i = 0; i < iMarcosSwap; i++){
@@ -97,6 +122,12 @@ public class ManejadorDeMemoria {
 		}
 		return contadorMarcosLibres;
 	}
+
+	/**
+	 * Buscar el primer marco de página vacío de la memoria.
+	 *
+	 * @return int el numero del primer marco de página vacío de la memoria.
+	 */
 	private int primerMarcoMemoriaVacio(){
 		int i = 0;
 		while(mdpMemoria[i].getiIDProceso() != 0){ //Ya se verificó que si había suficientes marcos disponibles
@@ -104,6 +135,12 @@ public class ManejadorDeMemoria {
 		}
 		return i;
 	}
+
+	/**
+	 * Buscar el primer marco de página vacío de swap.
+	 *
+	 * @return int el numero del primer marco de página vacío de swap.
+	 */
 	private int primerMarcoSwapVacio(){
 		int i = 0;
 		while(mdpSwap[i].getiIDProceso() != 0){ //Ya se verificó que si había suficientes marcos disponibles
