@@ -148,4 +148,58 @@ public class ManejadorDeMemoria {
 		}
 		return i;
 	}
+
+	/**
+	 * Liberar Proceso
+	 *
+	 * Liberar un procceso de memoria.
+	 *
+	 * @param iIDProceso es el identificador <code>int</code> del proceso a liberar.
+	 *
+	 * @return CajaTemporal es un objeto para contener los dos vectores
+	 * vecMemoria y vecSwap, que indican las paginas que se liberaron de
+	 * memoria y swap respectivamente, y bEstabaCargado que indica si ese
+	 * programa estaba cargado en primer lugar.
+ **/
+	public CajaTemporal liberarProceso( int iIDProceso ){
+		CajaTemporal cajaTemporal;
+		if(hsmTablasDePaginacion.containsKey(iIDProceso)){
+			TablaDePaginacion liberarP = hsmTablasDePaginacion.get(iIDProceso);
+
+			Vector<Integer> vecMemoria = liberarP.liberarMemoria();
+			Vector<Integer> vecSwap = liberarP.liberarSwap();
+
+			for (int iDirFisica : vecMemoria){
+				mdpMemoria[iDirFisica / iTamPagina] = new MarcoDePagina();
+			}
+			for (int iDirFisica : vecSwap){
+				mdpSwap[iDirFisica / iTamPagina] = new MarcoDePagina();
+			}
+
+			hsmTablasDePaginacion.remove(iIDProceso);
+
+			cajaTemporal = new CajaTemporal(true, vecMemoria, vecSwap);
+		}else{
+			cajaTemporal = new CajaTemporal(false, null, null);
+		}
+		return cajaTemporal;
+	}
+
+	public class CajaTemporal{
+		public Vector<Integer> vecMemoria;
+		public Vector<Integer> vecSwap;
+		public boolean bEstabaCargado;
+
+		CajaTemporal(boolean bEstabaCargado, Vector<Integer> vecMemoria, Vector<Integer> vecSwap){
+			if(bEstabaCargado){
+				this.vecMemoria = vecMemoria;
+				this.vecSwap = vecSwap;
+				this.bEstabaCargado = true;
+			}else{
+				this.vecMemoria = vecMemoria;
+				this.vecSwap = vecSwap;
+				this.bEstabaCargado = false;
+			}
+		}
+	}
 }
