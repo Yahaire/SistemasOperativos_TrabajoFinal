@@ -19,66 +19,104 @@ public class Main {
 		String sRespuesta;	// Almacena la respuesta de la consola
 		Scanner scaEntrada = new Scanner(System.in);	// Lee input de la consola
 		BufferedReader bfrArchivoEntrada = null;	// Enlace con el archivo
-
+		
 		Archivo arcEntrada;
-
+		
 		do {
 			for (int iK = 0; iK < 5; iK++) {	//"Limpiar" pantalla
 				System.out.println();
 			}
-
+			
 			arcEntrada = new Archivo();
-
+			
 			// Abrir archivo
 			System.out.print("Nombre del archivo: ");
 			sRespuesta = scaEntrada.nextLine();
-
+			
 			if (sRespuesta.contains(".txt")) {	//%a// Aceptar solo archivos .txt
 				try {
 					bfrArchivoEntrada = new BufferedReader( new FileReader(sRespuesta));
-
-					// Leer y guardar informaci√≥n del archivo
+					
+					// Leer y guardar informaciÛn del archivo
 					arcEntrada.setNombre(sRespuesta);
 																												////14
-					double dAux;	//%m
-					if ((sRespuesta = bfrArchivoEntrada.readLine()) != null) {
-						dAux = Double.parseDouble(sRespuesta);	//%m
-					}
-					else {	// El dato no se encuentra en la primera l√≠nea
-						dAux = -2;	//%m
-					}
-
-					boolean bNumNegativos = ( dAux < 0 );	//%a
-
-					if (!bNumNegativos) {	//%m// Revisar que el Xk sea v√°lido
-						arcEntrada.dXk = dAux;	//%m
-
+//					double dAux;	//%m
+//					if ((sRespuesta = bfrArchivoEntrada.readLine()) != null) {
+//						dAux = Double.parseDouble(sRespuesta);	//%m
+//					}
+//					else {	// El dato no se encuentra en la primera lÌnea
+//						dAux = -2;	//%m
+//					}
+					
+//					boolean bNumNegativos = ( dAux < 0 );	//%a
+					boolean bNumNegativos = false;	//%a
+					
+					if (!bNumNegativos) {	//%m// Revisar que el Xk sea v·lido
+						arcEntrada.dXk = 1;	//%m		///////////MODIFICAR
+					
 						String sEntrada;	// Guarda la linea completa del archivo
-						int iContLinea = 0;	// Cuenta la l√≠nea de datos que se est√° leyendo
-
+						int iContLinea = 0;	// Cuenta la lÌnea de datos que se est· leyendo
+						
 						while ( (sEntrada = bfrArchivoEntrada.readLine()) != null ) {
-							StringTokenizer tokEntrada = new StringTokenizer(sEntrada, ",");
+							
 							iContLinea++;
-
-							if (tokEntrada.countTokens() == 2) {
-								double dX = Double.parseDouble(tokEntrada.nextToken());	//%m
-								double dY = Double.parseDouble(tokEntrada.nextToken());	//%m
-
-								if (dX < 0 || dY < 0) {	//%a// "X" y "Y" deben ser mayores o iguales a 0
-									bNumNegativos = true;	//%a
-									break;	//%a
-								}
-
-								arcEntrada.AgregarPunto(dX, dY);	//%m
+							
+							String sError = arcEntrada.AgregarInstruccion(sEntrada, iContLinea);
+							
+							if ( sError.equals("") ) {
+								// Trabajar con string
 							}
 							else {
-								System.out.println("No se ha podido agregar la l√≠nea " + iContLinea + ". Revise su formato.");
+								System.out.print(sError);
 							}
 						}
 						bfrArchivoEntrada.close();
-
+						
+						// Procesar instrucciones						
+						if (arcEntrada.vecInstrucciones.size() > 0) {	// Conseguir la primera instrucciÛn
+							int iContInstruccion = 0;
+							Archivo.Instruccion insActual;
+							
+							insActual = arcEntrada.vecInstrucciones.get(0);
+						
+							// Recorrer todas las instrucciones disponibles o hasta que se indique se finaliza el programa
+							while (iContInstruccion < arcEntrada.vecInstrucciones.size()
+									&& !(insActual.sTipo.equals("E")) 
+									) {
+								ManejadorDeMemoria mdmSistemaOperativo = new mdmSistemaOperativo( 2048, 4096, 8 );
+								
+								
+								// Continuar hasta que se indique fin de secciÛn de instrucciones
+								while ( !(insActual.sTipo.equals("F")) ) {
+									if ( insActual.sTipo.equals("P") ) {	// Cargar proceso
+										if ( mdmSistemaOperativo.cargarProceso( insActual.iValor1, insActual.iValor2 ) ) {	// Cargar y manejar errores de carga
+											// SALIDA ESPERADA
+										}
+										else {	// Error. No se pudo cargar el proceso
+											System.out.println("No fue posible cargar el proceso. Posiblemente ya estaba cargado a memoria.");
+										}
+									}
+									else if ( insActual.sTipo.equals("A") ) {	// Accesar a proceso para leer o modificar
+										if ( mdmSistemaOperativo.accesarProceso(insActual.iValor1, insActual.iValor2, insActual.iValor3) ) {	// Accesar y manejar errores
+											// SALIDA ESPERADA
+										}
+										else {	// Error. No se pudo accesar al proceso
+											System.out.println("No fue posible accesar al proceso. Tal vez haya faltado cargarlo a memoria.");
+										}
+									}
+									//POR DESARROLLAR**************************
+									else if ( insActual.sTipo.equals("L") ) {	// Liberar proceso de memoria
+										
+									}
+								}
+							}
+						}
+						else {	// Error. No hay instrucciones
+							System.out.println("El archivo provisto no contiene instrucciones.");
+						}
+						
 						if (!bNumNegativos) {	//%a// Evitar datos menores a 0
-							if (arcEntrada.vecX.size() > 2) {	// Aceptar solo m√°s de 2 parejas de datos
+							if (arcEntrada.vecX.size() > 2) {	// Aceptar solo m·s de 2 parejas de datos
 							////33
 							// Mostrar resultados en pantalla
 //							CalculosAumentados calValores = new CalculosAumentados(arcEntrada.vecX, arcEntrada.vecY, arcEntrada.dXk);	//%m
@@ -99,31 +137,24 @@ public class Main {
 								System.out.println("Para dar resultados acertados, es necesario que el archivo contenga al menos 3 pares de datos.\n");
 							}
 						}
-						else {	//%a// Alguno de las parejas de datos contiene un n√∫mero negativo
-							System.out.println("El valor de todos los datos debe ser mayor o igual a 0.\n");	//%a
+						else {	//%a// Alguno de las parejas de datos contiene un n˙mero negativo
+							System.out.println("El valor de todos los datos debe ser mayor o igual a 0.\n");	
 						}
 					}
 					else {	// El dato Xk es menor a 0
-						System.out.println("El valor de todos los datos debe ser mayor o igual a 0.\n");	//%m
+						System.out.println("El valor de todos los datos debe ser mayor o igual a 0.\n");	
 					}
-
+					
 				} catch (FileNotFoundException e) { // Manejar errores al abrir el archivo
 					System.out.println("No se ha podido encontrar el archivo indicado\n");
-				} catch (NumberFormatException e) { // Manejar errores al leer datos
-					System.out.println("Alguno de los datos no tiene el formato correcto. "
-							+ "Aseg√∫rese que todos los n√∫meros sean decimales o enteros, "
-							+ "que la primera l√≠nea tenga 1 solo n√∫mero y que el resto "
-							+ "est√© conformado por parejas separadas √∫nicamente una coma.\n");	//%m
-					//%d=3
-				} catch (IOException e) {	// Manejar errores al leer Xk
-					//e.printStackTrace();
-					System.out.println("No se ha podido registrar el dato Xk correctamente.\n");
-				} finally {	//%a
-					if (bfrArchivoEntrada != null) {	//%a
-						try {	//%a
-							bfrArchivoEntrada.close();	//%a
-						} catch (IOException e) {	//%a
-							System.out.println("Ocurri√≥ un error inesperado al intentar cerrar el documento.");	//%a
+				} catch (IOException e) {	// Falta manejar
+					System.out.println("Error inesperado IOException.\n");
+				} finally {
+					if (bfrArchivoEntrada != null) {
+						try {	
+							bfrArchivoEntrada.close();	
+						} catch (IOException e) {	
+							System.out.println("OcurriÛ un error inesperado al intentar cerrar el documento.");	
 						}
 					}
 				}
@@ -131,7 +162,7 @@ public class Main {
 			else {	//%a//Denegar archivos que no sean .txt
 				System.out.println("El archivo debe ser un .txt para poder utilizarlo.\n");	//%a
 			}
-
+			
 			System.out.print("Desea correr el programa nuevamente?(s/n) ");
 			sRespuesta = scaEntrada.nextLine();
 		} while (sRespuesta.contains("s") || sRespuesta.contains("S"));
