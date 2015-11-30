@@ -1,14 +1,11 @@
 package trabajoFinal.cps;
-//java.lang.Object;
-//java.util.Date;
-//java.sql.Timestamp;
+
 
 public class MarcoDePagina {
-  int iIDProceso;
-  int iAcceso;
-  long iTimestamp;
-  int iNumPagTabla;
-
+	int iIDProceso;
+	int iAcceso;
+	long iTimestamp;
+	int iNumPagTabla;
 
 
 	public MarcoDePagina(){
@@ -23,11 +20,9 @@ public class MarcoDePagina {
 	}
 
 	public void Cargar(int iIDp, int iNumP){
-	//  Timestamp time = new Timestamp();
-
 		iIDProceso = iIDp;
 		iAcceso = 0;
-	//  iTimestamp = time.getime();
+		iTimestamp = System.currentTimeMillis();
 		iNumPagTabla = iNumP;
 	}
 
@@ -46,6 +41,4 @@ public class MarcoDePagina {
 	public int getiNumPagTabla(){
 		return iNumPagTabla;
 	}
-
-
 }
