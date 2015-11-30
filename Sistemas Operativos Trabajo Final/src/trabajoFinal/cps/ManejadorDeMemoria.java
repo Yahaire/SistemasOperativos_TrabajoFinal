@@ -40,8 +40,9 @@ public class ManejadorDeMemoria {
 		if(iPaginasRequeridas < memoriaVacia()){//No swapeo
 			Vector<Pagina> vecPaginasNuevoProceso = new Vector<Pagina>();
 			for(int i = 0; i < iPaginasRequeridas; i++){
-				int iDirMemoria = primerMarcoMemoriaVacio();
-				vecPaginasNuevoProceso.add(new Pagina(iDirMemoria));
+				int iMarco = primerMarcoMemoriaVacio();
+				vecPaginasNuevoProceso.add(new Pagina(iMarco * iTamPagina));
+				mdpMemoria[iMarco].cargar(iIDProceso, i);
 			}
 			hsmTablasDePaginacion.put(iIDProceso, new TablaDePaginacion(iIDProceso, vecPaginasNuevoProceso));
 
