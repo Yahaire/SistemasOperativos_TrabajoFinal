@@ -19,7 +19,7 @@ public class MarcoDePagina {
 		iAcceso++;
 	}
 
-	public void Cargar(int iIDp, int iNumP){
+	public void cargar(int iIDp, int iNumP){
 		iIDProceso = iIDp;
 		iAcceso = 0;
 		iTimestamp = System.currentTimeMillis();
