@@ -15,6 +15,13 @@ public class MarcoDePagina {
 		iNumPagTabla = 0;
 	}
 
+	public MarcoDePagina(int iIDProceso){
+		this.iIDProceso = iIDProceso;
+		iAcceso = 0;
+		iTimestamp = 0;
+		iNumPagTabla = 0;
+	}
+
 	public void acceso(){
 		iAcceso++;
 	}
