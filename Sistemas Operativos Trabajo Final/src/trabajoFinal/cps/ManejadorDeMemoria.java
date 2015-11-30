@@ -39,7 +39,6 @@ public class ManejadorDeMemoria {
 	 *
 	 * @return bool Regresa si el programa se pudo cargar o no.
 	 */
-	//TODO: Mejorar el return para poder saber la razón por la que no se pudo cargar el programa a memoria
 	public boolean cargarProceso(int iIDProceso, int iTam){
 		Vector <Pagina> vecPaginas;
 		if(iTam > iTamMemoria){
@@ -64,27 +63,15 @@ public class ManejadorDeMemoria {
 			int iPaginasASwapear = iPaginasRequeridas - memoriaVacia();
 
 			for(int i = 0; i < iPaginasASwapear; i++){
-				//Encontrar la pagina mas usada, estrategia de reemplazo MFU
-				int maxiAcceso = 0;
-				int maxiAccesoNum = 0;
-				long maxiAccesoTimestamp = 0;
-				for(int j = 0; j < iMarcosMemoria; j++){
-					if(mdpMemoria[j].getiAcceso() > maxiAcceso){
-						maxiAcceso = mdpMemoria[j].getiAcceso();
-						maxiAccesoNum = j;
-						maxiAccesoTimestamp = mdpMemoria[j].getiTimestamp();
-					}else if(mdpMemoria[j].getiAcceso() == maxiAcceso && mdpMemoria[j].getiTimestamp() < maxiAccesoTimestamp){
-						maxiAcceso = mdpMemoria[j].getiAcceso();
-						maxiAccesoNum = j;
-						maxiAccesoTimestamp = mdpMemoria[j].getiTimestamp();
-					}
-				}
-				int iMarcoSwap = primerMarcoSwapVacio();
-				TablaDePaginacion hsmTablaDeProccesoSwapeadoOut = hsmTablasDePaginacion.get(mdpMemoria[maxiAccesoNum].getiIDProceso());
-				hsmTablaDeProccesoSwapeadoOut.swapOutPagina(maxiAccesoNum * iTamPagina, iMarcoSwap * iTamPagina);
-				hsmTablasDePaginacion.replace(mdpMemoria[maxiAccesoNum].getiIDProceso(), hsmTablaDeProccesoSwapeadoOut);
+				int marcoSwapOut = mfu();
 
-				mdpMemoria[maxiAccesoNum].cargar(iIDProceso, i);
+				int iMarcoSwap = primerMarcoSwapVacio();
+				TablaDePaginacion hsmTablaDeProccesoSwapeadoOut = hsmTablasDePaginacion.get(mdpMemoria[marcoSwapOut].getiIDProceso());
+				hsmTablaDeProccesoSwapeadoOut.swapOutPagina(marcoSwapOut * iTamPagina, iMarcoSwap * iTamPagina);
+				hsmTablasDePaginacion.replace(mdpMemoria[marcoSwapOut].getiIDProceso(), hsmTablaDeProccesoSwapeadoOut);
+
+				mdpSwap[iMarcoSwap] = mdpMemoria[marcoSwapOut];
+				mdpMemoria[marcoSwapOut].cargar(iIDProceso, i);
 			}
 		}else{//No hay espacio en memoria virtual para cargar el programa
 			return false;
@@ -101,7 +88,7 @@ public class ManejadorDeMemoria {
 	private int memoriaVacia(){
 		int contadorMarcosLibres = 0;
 		for(int i = 0; i < iMarcosMemoria; i++){
-			if(mdpMemoria[i].getiIDProceso() == 0){
+			if(mdpMemoria[i].getiIDProceso() == -1){
 				contadorMarcosLibres++;
 			}
 		}
@@ -116,7 +103,7 @@ public class ManejadorDeMemoria {
 	private int swapVacio(){
 		int contadorMarcosLibres = 0;
 		for(int i = 0; i < iMarcosSwap; i++){
-			if(mdpSwap[i].getiIDProceso() == 0){
+			if(mdpSwap[i].getiIDProceso() == -1){
 				contadorMarcosLibres++;
 			}
 		}
@@ -130,7 +117,7 @@ public class ManejadorDeMemoria {
 	 */
 	private int primerMarcoMemoriaVacio(){
 		int i = 0;
-		while(mdpMemoria[i].getiIDProceso() != 0){ //Ya se verificó que si había suficientes marcos disponibles
+		while(mdpMemoria[i].getiIDProceso() != -1){ //Ya se verificó que si había suficientes marcos disponibles
 			i++;
 		}
 		return i;
@@ -143,11 +130,120 @@ public class ManejadorDeMemoria {
 	 */
 	private int primerMarcoSwapVacio(){
 		int i = 0;
-		while(mdpSwap[i].getiIDProceso() != 0){ //Ya se verificó que si había suficientes marcos disponibles
+		while(mdpSwap[i].getiIDProceso() != -1){ //Ya se verificó que si había suficientes marcos disponibles
 			i++;
 		}
 		return i;
 	}
+
+	private int mfu(){
+		int maxiAcceso = -1;
+		int maxiAccesoNum = -1;
+		long maxiAccesoTimestamp = -1;
+		for(int j = 0; j < iMarcosMemoria; j++){
+			if(mdpMemoria[j].getiAcceso() > maxiAcceso){
+				maxiAcceso = mdpMemoria[j].getiAcceso();
+				maxiAccesoNum = j;
+				maxiAccesoTimestamp = mdpMemoria[j].getiTimestamp();
+			}else if(mdpMemoria[j].getiAcceso() == maxiAcceso && mdpMemoria[j].getiTimestamp() < maxiAccesoTimestamp){
+				maxiAcceso = mdpMemoria[j].getiAcceso();
+				maxiAccesoNum = j;
+				maxiAccesoTimestamp = mdpMemoria[j].getiTimestamp();
+			}
+		}
+		return maxiAccesoNum;
+	}
+
+	/**
+	 * Accesar Proceso
+	 *
+	 * Traduce la dirección del proceso iIDProceso en
+	 * hsmTablasDePaginacion y llama al método accesar de los
+	 * MarcoDePagina que fueron accesados.
+	 *
+	 * @param iIDProceso es el identificador <code>int</code> del proceso
+	 * que accesa a su memoria liberar.
+	 *
+	 * @param iPagina es el numero <code>int</code> de página que se quiere accesar
+	 *
+	 * @param bModificar es un <code>boolean</code> que indica si se va a
+	 * modificar la página accesada
+	 *
+	 * //TODO: Corregir el return
+	 * @return <code>int</code> con el estatus del acceso.
+	 * 	0 -> acceso exitoso.
+	 * 	1 -> el programa no está cargado.
+	 * 	2 -> esa página no pertenece a ese procceso.
+	 */
+	MarcoAccesado accesarProceso(int iIDProceso, int iPagina, boolean bModificar){
+		if(!hsmTablasDePaginacion.containsKey(iIDProceso)){// el procceso no se encuentra cargado
+			MarcoAccesado marcoAccesado = new MarcoAccesado();
+			marcoAccesado.iError = 1;
+			return marcoAccesado;
+		}
+
+		Vector <Pagina> vecPaginas = hsmTablasDePaginacion.get(iIDProceso).getVecPaginas();
+
+		if(iPagina > vecPaginas.size()){//esa página no pertenece a ese procceso
+			MarcoAccesado marcoAccesado = new MarcoAccesado();
+			marcoAccesado.iError = 2;
+			return marcoAccesado;
+		}
+
+		Pagina paginaAccesada = vecPaginas.get(iPagina);
+		if(!paginaAccesada.getbSwap()){// la Pagina está en memoria, no hay swaping
+			int iMarco = paginaAccesada.getDirFisica() / iTamPagina;
+			mdpMemoria[iMarco].acceso();
+
+			MarcoAccesado marcoAccesado = new MarcoAccesado();
+			marcoAccesado.iMarcoDeMemoria = iMarco;
+			return marcoAccesado;
+
+			//TODO: Cambiarla si fue modificada
+		}else{// la Pagina está en swap, hay que hacer swapIn
+			if(memoriaVacia() > 1){// si hay espacio en memoria para hacer el swapIn
+				int iMarco = primerMarcoMemoriaVacio();
+				mdpMemoria[iMarco] = new MarcoDePagina(iIDProceso);
+
+				TablaDePaginacion tablaDePaginacion = hsmTablasDePaginacion.get(iIDProceso);
+				tablaDePaginacion.swapInPagina(paginaAccesada.getiDirSwap(), iMarco * 8);
+				hsmTablasDePaginacion.replace(iIDProceso, tablaDePaginacion);
+
+				MarcoAccesado marcoAccesado = new MarcoAccesado();
+				marcoAccesado.iMarcoDeMemoria = iMarco;
+				marcoAccesado.iMarcoDeSwapParaSwapIn = paginaAccesada.getiDirSwap() / iTamPagina;
+				marcoAccesado.iIDProcesoSwapIn = iIDProceso;
+				return marcoAccesado;
+			}else{// no hay espacio en memoria para hacer el swapIn, hay que hacer swapOut primero
+				MarcoAccesado marcoAccesado = new MarcoAccesado();
+
+				int iMarcoMemoria = mfu();
+				marcoAccesado.iMarcoDeMemoria = iMarcoMemoria;
+
+				int iMarcoSwap = primerMarcoSwapVacio();
+
+				//Swap Out
+				TablaDePaginacion hsmTablaDeProccesoSwapeadoOut = hsmTablasDePaginacion.get(mdpMemoria[iMarcoMemoria].getiIDProceso());
+				marcoAccesado.iPaginaSwapOut = mdpMemoria[iMarcoMemoria].getiNumPagTabla();
+				hsmTablaDeProccesoSwapeadoOut.swapOutPagina(iMarcoMemoria * iTamPagina, iMarcoSwap * iTamPagina);
+				hsmTablasDePaginacion.replace(mdpMemoria[iMarcoMemoria].getiIDProceso(), hsmTablaDeProccesoSwapeadoOut);
+
+				mdpSwap[iMarcoSwap] = mdpMemoria[marcoAccesado.iPaginaSwapOut];
+
+				//Swap In
+				marcoAccesado.iMarcoDeSwapParaSwapIn = paginaAccesada.getiDirSwap() / iTamPagina;
+				mdpMemoria[iMarcoMemoria] = mdpSwap[marcoAccesado.iMarcoDeSwapParaSwapIn];
+
+				TablaDePaginacion tablaDePaginacion = hsmTablasDePaginacion.get(iIDProceso);
+				tablaDePaginacion.swapInPagina(paginaAccesada.getiDirSwap(), iMarcoMemoria * iTamPagina);
+				hsmTablasDePaginacion.replace(iIDProceso, tablaDePaginacion);
+
+				marcoAccesado.iIDProcesoSwapIn = iIDProceso;
+				return marcoAccesado;
+			}
+		}
+	}
+
 
 	/**
 	 * Liberar Proceso
@@ -156,13 +252,13 @@ public class ManejadorDeMemoria {
 	 *
 	 * @param iIDProceso es el identificador <code>int</code> del proceso a liberar.
 	 *
-	 * @return CajaTemporal es un objeto para contener los dos vectores
+	 * @return <code>CajaTemporal</code> es un objeto para contener los dos vectores
 	 * vecMemoria y vecSwap, que indican las paginas que se liberaron de
 	 * memoria y swap respectivamente, y bEstabaCargado que indica si ese
 	 * programa estaba cargado en primer lugar.
  **/
-	public CajaTemporal liberarProceso( int iIDProceso ){
-		CajaTemporal cajaTemporal;
+	public MarcosLiberados liberarProceso( int iIDProceso ){
+		MarcosLiberados marcosLiberados;
 		if(hsmTablasDePaginacion.containsKey(iIDProceso)){
 			TablaDePaginacion liberarP = hsmTablasDePaginacion.get(iIDProceso);
 
@@ -178,19 +274,19 @@ public class ManejadorDeMemoria {
 
 			hsmTablasDePaginacion.remove(iIDProceso);
 
-			cajaTemporal = new CajaTemporal(true, vecMemoria, vecSwap);
+			marcosLiberados = new MarcosLiberados(true, vecMemoria, vecSwap);
 		}else{
-			cajaTemporal = new CajaTemporal(false, null, null);
+			marcosLiberados = new MarcosLiberados(false, null, null);
 		}
-		return cajaTemporal;
+		return marcosLiberados;
 	}
 
-	public class CajaTemporal{
+	public class MarcosLiberados{
 		public Vector<Integer> vecMemoria;
 		public Vector<Integer> vecSwap;
 		public boolean bEstabaCargado;
 
-		CajaTemporal(boolean bEstabaCargado, Vector<Integer> vecMemoria, Vector<Integer> vecSwap){
+		MarcosLiberados(boolean bEstabaCargado, Vector<Integer> vecMemoria, Vector<Integer> vecSwap){
 			if(bEstabaCargado){
 				this.vecMemoria = vecMemoria;
 				this.vecSwap = vecSwap;
@@ -200,6 +296,22 @@ public class ManejadorDeMemoria {
 				this.vecSwap = vecSwap;
 				this.bEstabaCargado = false;
 			}
+		}
+	}
+	public class MarcoAccesado{
+		public int iError;
+		public boolean bPagefault;
+		public boolean bSwapOut;
+		public int iIDProcesoSwapOut;
+		public int iIDProcesoSwapIn;
+		public int iMarcoDeMemoria;
+		public int iMarcoDeSwapParaSwapIn;
+		public int iMarcoDeSwapParaSwapOut;
+		public int iPagina;
+		public int iPaginaSwapOut;
+
+		MarcoAccesado(){
+			iError = 0;
 		}
 	}
 }
