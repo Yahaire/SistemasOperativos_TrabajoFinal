@@ -5,9 +5,9 @@ import java.util.Vector;
 
 public class TablaDePaginacion {
 	//Guarda la dirección en memoria de la página [n] del vector.
-	Vector <Pagina> vecPaginas;
+	private Vector <Pagina> vecPaginas;
 	// ID del proceso al cual pertenece la tabla de paginación.
-	int iIDProceso;
+	private int iIDProceso;
 
 	/**
 	 * Inicializa iIDProceso, y el vector de Páginas.
@@ -31,7 +31,7 @@ public class TablaDePaginacion {
 
 		Vector<Integer> vecLiberar = new Vector<>();
 
-		for (Pagina p : vecPaginas) {
+		for (Pagina p : getVecPaginas()) {
 			vecLiberar.addElement(p.getDirFisica());
 		}
 
@@ -49,11 +49,89 @@ public class TablaDePaginacion {
 
 		Vector<Integer> vecLiberar = new Vector<>();
 
-		for (Pagina p : vecPaginas) {
+		for (Pagina p : getVecPaginas()) {
 			vecLiberar.addElement(p.iDirSwap);
 		}
 
 		return vecLiberar;
 	}
+
+		/**
+		 * Llama a la función swapOut() de la Pagina que se encuentra en iDirMem
+		 *
+		 * @param iDirMem Es la dirección en Memoria de la pagina a la que se hara swapOut.
+		 * @param iDirSwap Es la dirección de Swap donde se pondrá la página.
+		 */
+		public void swapOutPagina (int iDirMem, int iDirSwap) {
+
+			for (Pagina p : getVecPaginas()) {
+				if (p.getDirFisica() == iDirMem) {
+					p.swapOut(iDirSwap);
+					break;
+				}
+			}
+		}
+
+		/**
+		 * Llama a la función swapIn() de la Pagina que se encuentra en iDirSwap
+		 *
+		 * @param iDirSwap Es la dirección de Swap de donde se saca la página.
+		 * @param iDirMem Es la dirección en Memoria donde se pondrá la página.
+		 */
+		public void swapInPagina (int iDirSwap, int iDirMem) {
+
+			for (Pagina p : getVecPaginas()) {
+				if (p.iDirSwap() == iDirSwap) {
+					p.swapIn(iDirMem);
+					break;
+				}
+			}
+		}
+
+
+		/**
+	 * Get VecPaginas
+	 *
+	 * Método get de vecPaginas
+	 *
+	 * @return El vector <code>Pagina</code> que contiene la dirección
+		 * de las paginas en las que esta cargado el proceso.
+	 */
+		public Vector <Pagina> getVecPaginas() {
+			return vecPaginas;
+		}
+
+		/**
+		 * Set VecPaginas
+		 *
+		 * Método set de vecPaginas
+		 *
+		 * @param vecPaginas El vector de paginas que se recibirá.
+		 */
+		public void setVecPaginas(Vector <Pagina> vecPaginas) {
+			this.vecPaginas = vecPaginas;
+		}
+
+		/**
+	 * Get iIDProceso
+	 *
+	 * Método get de iIDProceso
+	 *
+	 * @return El <code>int</code> que contiene el ID del proceso.
+	 */
+		public int getiIDProceso() {
+			return iIDProceso;
+		}
+
+		/**
+		 * Set iIDProceso
+		 *
+		 * Método set de iIDProceso
+		 *
+		 * @param iIDProceso El ID que se le asignará al proceso.
+		 */
+		public void setiIDProceso(int iIDProceso) {
+			this.iIDProceso = iIDProceso;
+		}
 }
 
