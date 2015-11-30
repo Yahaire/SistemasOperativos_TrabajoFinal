@@ -79,7 +79,7 @@ public class Main {
 								if ( insActual.sTipo.equals("P") ) {	// Cargar proceso
 									System.out.println("Asignar " + insActual.iValor1 + "bytes al proceso " + insActual.iValor2);
 									
-									ManejadorDeMemoria.CajaTemporal cajaTemporal = mdmSistemaOperativo.cargarProceso(insActual.iValor1, insActual.iValor2);
+									ManejadorDeMemoria.ProccesoCargado cajaTemporal = mdmSistemaOperativo.cargarProceso(insActual.iValor1, insActual.iValor2);
 									
 									switch (cajaTemporal.iError) {
 										case 0:	// Se cargó el programa correctamente
@@ -88,7 +88,7 @@ public class Main {
 											for (ManejadorDeMemoria.InfoSwap infSwap: cajaTemporal.vecInfoSwap) {	// Mostrar outputs si hubo swaps
 												System.out.print("Pagina " + infSwap.iPagina 
 														+ " del proceso " + infSwap.iIDProceso
-														+ " swappeada al marco " + infSwap.iMarcoDeSwap
+														+ " swappeada al marco " + infSwap.iMarcoSwap
 														+ " del area de swapping");
 											}
 											
@@ -119,26 +119,27 @@ public class Main {
 									}
 									System.out.println(".");
 									
-									ManejadorDeMemoria.CajaTemporal cajaTemporal = mdmSistemaOperativo.accesarProceso(insActual.iValor1, insActual.iValor2, insActual.iValor3);;
+									boolean bModificar = insActual.iValor3 == 1;
+									ManejadorDeMemoria.MarcoAccesado cajaTemporal = mdmSistemaOperativo.accesarProceso(insActual.iValor1, insActual.iValor2, bModificar);
 									
 									switch (cajaTemporal.iError) {
 										case 0:	// Se accesó el programa correctamente
 											if ( cajaTemporal.bPagefault ) { // Se tuvo que cargar página a memoria
 												if ( cajaTemporal.bSwapOut ) {	// Fue necersario el hacer un swap para cargar la página a memoria
 													System.out.println(
-															"Pagina " + iPaginaSwapOut
-															+ " del proceso " + iIDProcesoSwapOut
-															+ " swappeada al marco " + iMarcoDeSwapParaSwapOut
+															"Pagina " + cajaTemporal.iPaginaSwapOut
+															+ " del proceso " + cajaTemporal.iIDProcesoSwapOut
+															+ " swappeada al marco " + cajaTemporal.iMarcoDeSwapParaSwapOut
 															);
 												}
 												
-												System.out.print(
+												System.out.print(	// Decir dónde quedó cargado el proceso
 														"Se localizo la pagina " + cajaTemporal.iPagina
 														+ "del proceso " + cajaTemporal.iIDProcesoSwapIn
-														" que estaba en la posicion " + cajaTemporal.iMarcoDeSwapParaSwapIn
-														" de swapping y se cargo al marco " + iMarcoDeMemoria);
+														+ " que estaba en la posicion " + cajaTemporal.iMarcoDeSwapParaSwapIn
+														+ " de swapping y se cargo al marco " + cajaTemporal.iMarcoDeMemoria);
 												
-												if ( insActual.iValor3 ) {
+												if ( insActual.iValor3 == 1) {
 													System.out.print(" modificada");
 												}
 												
@@ -147,11 +148,6 @@ public class Main {
 											System.out.println(
 													"Direccion virtual: " + insActual.iValor1
 													+ "\tDireccion real: " + cajaTemporal.iMarcoDeMemoria);
-											
-											System.out.print("Se asignaron los siguientes marcos de pagina al proceso " + insActual.iValor1 + ": ");
-											for (Integer iMarcoAsignado: cajaTemporal.vecMarcosMemoriaAsignados) {
-												System.out.print( iMarcoAsignado + ", ");
-											}
 											break;
 										case 1:	// Error. El proceso es más grande que la memoria 
 											System.out.println("No fue posible cargar el proceso. El proceso que se intenta cargar es mas grande que la memoria.");
@@ -168,7 +164,7 @@ public class Main {
 									
 								}
 								else if ( insActual.sTipo.equals("L") ) {	// Liberar proceso de memoria
-									ManejadorDeMemoria.CajaTemporal cajaTemporal = mdmSistemaOperativo.liberarProceso(insActual.iValor1);
+									ManejadorDeMemoria.MarcosLiberados cajaTemporal = mdmSistemaOperativo.liberarProceso(insActual.iValor1);
 									
 									if (cajaTemporal.bEstabaCargado) {	// Asegurarse que el proceso estaba cargado en memoria
 										hsmTurnarounds.put(insActual.iValor1, System.currentTimeMillis() - hsmTurnarounds.get(insActual.iValor1));	// Calcular turnaround time

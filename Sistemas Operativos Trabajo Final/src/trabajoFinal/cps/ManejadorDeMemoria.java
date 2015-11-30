@@ -198,7 +198,7 @@ public class ManejadorDeMemoria {
 	 * 	1 -> el programa no está cargado.
 	 * 	2 -> esa página no pertenece a ese procceso.
 	 */
-	MarcoAccesado accesarProceso(int iIDProceso, int iPagina, boolean bModificar){
+	public MarcoAccesado accesarProceso(int iIDProceso, int iPagina, boolean bModificar){
 		if(!hsmTablasDePaginacion.containsKey(iIDProceso)){// el procceso no se encuentra cargado
 			MarcoAccesado marcoAccesado = new MarcoAccesado();
 			marcoAccesado.iError = 1;
