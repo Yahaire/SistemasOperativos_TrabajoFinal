@@ -4,48 +4,48 @@ package trabajoFinal.cps;
 //java.sql.Timestamp;
 
 public class MarcoDePagina {
-      int iIDProceso;
-      int iAcceso;
-      long iTimestamp;
-      int iNumPagTabla;
+  int iIDProceso;
+  int iAcceso;
+  long iTimestamp;
+  int iNumPagTabla;
 
 
 
-  public MarcoDePagina(){
-    iIDProceso = 0;
-    iAcceso = 0;
-    iTimestamp = 0;
-    iNumPagTabla = 0;
-  }
+	public MarcoDePagina(){
+		iIDProceso = 0;
+		iAcceso = 0;
+		iTimestamp = 0;
+		iNumPagTabla = 0;
+	}
 
-  public void acceso(){
-    iAcceso++;
-  }
+	public void acceso(){
+		iAcceso++;
+	}
 
-  public void Cargar(int iIDp, int iNumP){
-  //  Timestamp time = new Timestamp();
+	public void Cargar(int iIDp, int iNumP){
+	//  Timestamp time = new Timestamp();
 
-    iIDProceso = iIDp;
-    iAcceso = 0;
-  //  iTimestamp = time.getime();
-    iNumPagTabla = iNumP;
-  }
+		iIDProceso = iIDp;
+		iAcceso = 0;
+	//  iTimestamp = time.getime();
+		iNumPagTabla = iNumP;
+	}
 
-  public int getiIDProceso(){
-    return iIDProceso;
-  }
+	public int getiIDProceso(){
+		return iIDProceso;
+	}
 
-  public int getiAcceso(){
-    return iAcceso;
-  }
+	public int getiAcceso(){
+		return iAcceso;
+	}
 
-  public long getiTimestamp(){
-    return iTimestamp;
-  }
+	public long getiTimestamp(){
+		return iTimestamp;
+	}
 
-  public int getiNumPagTabla(){
-    return iNumPagTabla;
-  }
+	public int getiNumPagTabla(){
+		return iNumPagTabla;
+	}
 
 
 }
