@@ -2,6 +2,8 @@ package trabajoFinal.cps;
 
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.Set;
+import java.util.Arrays;
 
 public class ManejadorDeMemoria {
 	HashMap<Integer, TablaDePaginacion> hsmTablasDePaginacion;
@@ -300,6 +302,12 @@ public class ManejadorDeMemoria {
 			marcosLiberados = new MarcosLiberados(false, null, null);
 		}
 		return marcosLiberados;
+	}
+
+	public Vector<Integer> getTodosProcesos(){
+		Set setIDProcesos = hsmTablasDePaginacion.keySet();
+
+		return new Vector(Arrays.asList(setIDProcesos.toArray()));
 	}
 
 	public class MarcosLiberados{
