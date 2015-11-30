@@ -10,10 +10,7 @@ import java.util.StringTokenizer;
 
 public class Archivo {
 	private String sNombre;			// nombre del archivo
-	public Vector<Double> vecX;		//%m// Posici贸n en X de los puntos
-	public Vector<Double> vecY;		//%m// Posici贸n en Y de los puntos
 	public Vector<Instruccion> vecInstrucciones;
-	public double dXk;				//%m// Guarda el dato Xk del archivo (primer dato a leer)
 
 	/*
 	 * Archivo
@@ -22,10 +19,7 @@ public class Archivo {
 	 */
 	public Archivo() {
 		sNombre = "";
-		vecX = new Vector<Double>();	//%m
-		vecY = new Vector<Double>();	//%m
 		vecInstrucciones = new Vector<Instruccion>();
-		dXk = -1;					//%m
 	}
 
 	/*
@@ -37,10 +31,7 @@ public class Archivo {
 	 */
 	public Archivo( String sNombre ) {
 		this.sNombre = sNombre;
-		vecX = new Vector<Double>();	//%m
-		vecY = new Vector<Double>();	//%m
 		vecInstrucciones = new Vector<Instruccion>();
-		dXk = -1;				 	//%m
 	}
 
 	/*
@@ -104,6 +95,7 @@ public class Archivo {
 				Instruccion insAAgregar = new Instruccion(sDefinidor, iValores[0], iValores[1], iValores[2]);
 
 				if ( insAAgregar.esInstruccionValida() ) {
+					insAAgregar.setInstruccion(sInstruccion);
 					this.vecInstrucciones.addElement(insAAgregar);
 				}
 				else {
@@ -132,6 +124,7 @@ public class Archivo {
 		int iValor3;	// Valor 3 (en caso de necesitarse para la instrucci贸n)
 		int iCantValDisp;	// Cantidad de valores disponibles. Depende del tipo de instrucci贸n.
 		boolean bInstruccionValida;	// Indica si la instrucci贸n es v谩lida o no
+		String sInstruccion;	// Versi髇 string de la instrucci髇
 
 		/*
 		 * Instruccion
@@ -216,6 +209,22 @@ public class Archivo {
 			else {
 				return -1;
 			}
+		}
+		
+		/**
+		 * Set Instrucci髇
+		 * 
+		 * M閠odo set de la instrucci髇.
+		 * Atenci髇: tan solo es para poder referencias la instrucci髇 despu閟.
+		 * 
+		 * @param sInstruccion es la instrucci髇 <code>String</code> utilizada
+		 */
+		public void setInstruccion( String sInstruccion ) {
+			this.sInstruccion = new String(sInstruccion);
+		}
+		
+		public String getInstruccion() {
+			return this.sInstruccion;
 		}
 	}
 
