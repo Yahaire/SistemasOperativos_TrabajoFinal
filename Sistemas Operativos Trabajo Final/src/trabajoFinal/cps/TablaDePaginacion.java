@@ -15,7 +15,7 @@ public class TablaDePaginacion {
 	 * @param iIDProceso es el ID del prcoceso a inicializar.
 	 * @param vecPaginas es el vector que guarda la dirección en memoria de la página [n] del vector.
 	 */
-	public void TablaDePaginacion(int iIDProceso, Vector<Pagina> vecPaginas) {
+	public TablaDePaginacion(int iIDProceso, Vector<Pagina> vecPaginas) {
 		this.iIDProceso = iIDProceso;
 		this.vecPaginas = vecPaginas;
 	}
