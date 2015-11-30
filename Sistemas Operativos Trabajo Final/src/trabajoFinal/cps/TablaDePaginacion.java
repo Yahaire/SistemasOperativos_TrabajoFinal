@@ -81,7 +81,7 @@ public class TablaDePaginacion {
 		public void swapInPagina (int iDirSwap, int iDirMem) {
 
 			for (Pagina p : getVecPaginas()) {
-				if (p.iDirSwap() == iDirSwap) {
+				if (p.getiDirSwap() == iDirSwap) {
 					p.swapIn(iDirMem);
 					break;
 				}
@@ -133,5 +133,23 @@ public class TablaDePaginacion {
 		public void setiIDProceso(int iIDProceso) {
 			this.iIDProceso = iIDProceso;
 		}
+
+	/**
+	 * Get Página por Direccion
+	 *
+	 * Obtener el numero de página del proceso que corresponde a la direccion.
+	 *
+	 * @param iDirFisica es el <code>int</code> de la dirección de la que se busca la página.
+	 *
+	 * @return el indice de la pagina
+	 */
+	public int getPaginaPorDir(int iDirFisica){
+		for(int i = 0; i < vecPaginas.size(); i++){
+			if (vecPaginas.get(i).getDirFisica() == iDirFisica){
+				return i;
+			}
+		}
+		return -1;
+	}
 }
 
