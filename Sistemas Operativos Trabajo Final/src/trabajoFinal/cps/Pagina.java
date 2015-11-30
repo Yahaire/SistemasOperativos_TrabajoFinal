@@ -82,7 +82,7 @@ public class Pagina {
 	 *
 	 * @return la dirección <code>int</code> en memoria en donde está guardada la página si bSwap es false
 	 */
-	public int iDirSwap() {
+	public int getiDirSwap() {
 		return this.iDirSwap;
 	}
 
