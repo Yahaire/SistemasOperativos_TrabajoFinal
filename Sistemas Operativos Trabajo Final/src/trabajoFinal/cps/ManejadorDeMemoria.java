@@ -47,9 +47,31 @@ public class ManejadorDeMemoria {
 			hsmTablasDePaginacion.put(iIDProceso, new TablaDePaginacion(iIDProceso, vecPaginasNuevoProceso));
 
 		}else if(iPaginasRequeridas < (memoriaVacia() + swapVacio())){//Si hay swapeo
+			int iPaginasASwapear = iPaginasRequeridas - memoriaVacia();
 
+			for(int i = 0; i < iPaginasASwapear; i++){
+				//Encontrar la pagina mas usada, estrategia de reemplazo MFU
+				int maxiAcceso = 0;
+				int maxiAccesoNum = 0;
+				long maxiAccesoTimestamp = 0;
+				for(int j = 0; j < iMarcosMemoria; j++){
+					if(mdpMemoria[j].getiAcceso() > maxiAcceso){
+						maxiAcceso = mdpMemoria[j].getiAcceso();
+						maxiAccesoNum = j;
+						maxiAccesoTimestamp = mdpMemoria[j].getiTimestamp();
+					}else if(mdpMemoria[j].getiAcceso() == maxiAcceso && mdpMemoria[j].getiTimestamp() < maxiAccesoTimestamp){
+						maxiAcceso = mdpMemoria[j].getiAcceso();
+						maxiAccesoNum = j;
+						maxiAccesoTimestamp = mdpMemoria[j].getiTimestamp();
+					}
+				}
+				int iMarcoSwap = primerMarcoSwapVacio();
+				TablaDePaginacion hsmTablaDeProccesoSwapeadoOut = hsmTablasDePaginacion.get(mdpMemoria[maxiAccesoNum].getiIDProceso());
+				hsmTablaDeProccesoSwapeadoOut.swapOutPagina(maxiAccesoNum * iTamPagina, iMarcoSwap * iTamPagina);
+				hsmTablasDePaginacion.replace(mdpMemoria[maxiAccesoNum].getiIDProceso(), hsmTablaDeProccesoSwapeadoOut);
 
-
+				mdpMemoria[maxiAccesoNum].cargar(iIDProceso, i);
+			}
 		}else{//No hay espacio en memoria virtual para cargar el programa
 			return false;
 		}
@@ -78,6 +100,13 @@ public class ManejadorDeMemoria {
 	private int primerMarcoMemoriaVacio(){
 		int i = 0;
 		while(mdpMemoria[i].getiIDProceso() != 0){ //Ya se verificó que si había suficientes marcos disponibles
+			i++;
+		}
+		return i;
+	}
+	private int primerMarcoSwapVacio(){
+		int i = 0;
+		while(mdpSwap[i].getiIDProceso() != 0){ //Ya se verificó que si había suficientes marcos disponibles
 			i++;
 		}
 		return i;
