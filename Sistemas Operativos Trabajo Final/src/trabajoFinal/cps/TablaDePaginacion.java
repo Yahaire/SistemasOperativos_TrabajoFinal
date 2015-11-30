@@ -13,11 +13,11 @@ public class TablaDePaginacion {
      * Inicializa iIDProceso, y el vector de Páginas.
      *
      * @param iIDProceso es el ID del prcoceso a inicializar.
-     * @param iNumPaginas es la cantidad de paginas del proceso.
+     * @param vecPaginas es el vector que guarda la dirección en memoria de la página [n] del vector.
      */
-    public void TablaDePaginacion(int iIDProceso, int iNumPaginas) {
+    public void TablaDePaginacion(int iIDProceso, Vector<Pagina> vecPaginas) {
         this.iIDProceso = iIDProceso;
-        vecPaginas.setSize(iNumPaginas);
+        this.vecPaginas = vecPaginas;
     }
 
     /**
@@ -32,7 +32,7 @@ public class TablaDePaginacion {
         Vector<Integer> vecLiberar = new Vector<>();
 
         for (Pagina p : vecPaginas) {
-            vecLiberar.addElement(p.getDirFisica);
+            vecLiberar.addElement(p.getDirFisica());
         }
 
         return vecLiberar;
