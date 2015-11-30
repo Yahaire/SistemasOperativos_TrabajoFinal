@@ -37,47 +37,68 @@ public class ManejadorDeMemoria {
 	 * @param int iIDProceso es el ID del prcoceso a cargar.
 	 * @param int iTam es el tamaño en bytes del programa a cargar.
 	 *
+	 * TODO: Corregir return
 	 * @return bool Regresa si el programa se pudo cargar o no.
 	 */
-	public boolean cargarProceso(int iIDProceso, int iTam){
+	public ProccesoCargado cargarProceso(int iIDProceso, int iTam){
 		Vector <Pagina> vecPaginas;
 		if(iTam > iTamMemoria){
-			return false;
+			return new ProccesoCargado(1);
 		}
 		if(hsmTablasDePaginacion.containsKey(iIDProceso)){
-			return false;
+			return new ProccesoCargado(2);
 		}
 
 		int iPaginasRequeridas = iTam/iTamPagina + ((iTam%iTamPagina != 0)?1:0);
 
 		if(iPaginasRequeridas < memoriaVacia()){//No swapeo
 			Vector<Pagina> vecPaginasNuevoProceso = new Vector<Pagina>();
+			Vector<Integer> vecMarcosMemoriaAsignados = new Vector<Integer>();
 			for(int i = 0; i < iPaginasRequeridas; i++){
 				int iMarco = primerMarcoMemoriaVacio();
 				vecPaginasNuevoProceso.add(new Pagina(iMarco * iTamPagina));
+				vecMarcosMemoriaAsignados.add(iMarco);
 				mdpMemoria[iMarco].cargar(iIDProceso, i);
 			}
 			hsmTablasDePaginacion.put(iIDProceso, new TablaDePaginacion(iIDProceso, vecPaginasNuevoProceso));
 
+			return new ProccesoCargado(iIDProceso, iPaginasRequeridas, vecMarcosMemoriaAsignados);
 		}else if(iPaginasRequeridas < (memoriaVacia() + swapVacio())){//Si hay swapeo
 			int iPaginasASwapear = iPaginasRequeridas - memoriaVacia();
 
+			Vector<InfoSwap> vecInfoSwap = new Vector<InfoSwap>();
+
+			//Swap Out
 			for(int i = 0; i < iPaginasASwapear; i++){
 				int marcoSwapOut = mfu();
 
 				int iMarcoSwap = primerMarcoSwapVacio();
 				TablaDePaginacion hsmTablaDeProccesoSwapeadoOut = hsmTablasDePaginacion.get(mdpMemoria[marcoSwapOut].getiIDProceso());
+				int iPaginaSwap = hsmTablaDeProccesoSwapeadoOut.getPaginaPorDir(marcoSwapOut * iTamPagina);
 				hsmTablaDeProccesoSwapeadoOut.swapOutPagina(marcoSwapOut * iTamPagina, iMarcoSwap * iTamPagina);
 				hsmTablasDePaginacion.replace(mdpMemoria[marcoSwapOut].getiIDProceso(), hsmTablaDeProccesoSwapeadoOut);
 
 				mdpSwap[iMarcoSwap] = mdpMemoria[marcoSwapOut];
 				mdpMemoria[marcoSwapOut].cargar(iIDProceso, i);
-			}
-		}else{//No hay espacio en memoria virtual para cargar el programa
-			return false;
-		}
 
-		return true;
+				vecInfoSwap.add(new InfoSwap(mdpSwap[iMarcoSwap].getiIDProceso(), marcoSwapOut, iMarcoSwap, iPaginaSwap));
+			}
+
+			//Cargar
+			Vector<Pagina> vecPaginasNuevoProceso = new Vector<Pagina>();
+			Vector<Integer> vecMarcosMemoriaAsignados = new Vector<Integer>();
+			for(int i = 0; i < iPaginasRequeridas; i++){
+				int iMarco = primerMarcoMemoriaVacio();
+				vecPaginasNuevoProceso.add(new Pagina(iMarco * iTamPagina));
+				vecMarcosMemoriaAsignados.add(iMarco);
+				mdpMemoria[iMarco].cargar(iIDProceso, i);
+			}
+			hsmTablasDePaginacion.put(iIDProceso, new TablaDePaginacion(iIDProceso, vecPaginasNuevoProceso));
+
+			return new ProccesoCargado(iIDProceso, iPaginasRequeridas, vecMarcosMemoriaAsignados, vecInfoSwap);
+		}else{//No hay espacio en memoria virtual para cargar el programa
+			return new ProccesoCargado(3);
+		}
 	}
 
 	/**
@@ -312,6 +333,43 @@ public class ManejadorDeMemoria {
 
 		MarcoAccesado(){
 			iError = 0;
+		}
+	}
+	public class InfoSwap{
+		public int iIDProceso;
+		public int iMarcoDeMemoria;
+		public int iMarcoSwap;
+		public int iPagina;
+
+		InfoSwap(int iIDProceso, int iMarcoDeMemoria, int iMarcoSwap, int iPagina){
+			this.iIDProceso = iIDProceso;
+			this.iMarcoDeMemoria = iMarcoDeMemoria;
+			this.iMarcoSwap = iMarcoSwap;
+			this.iPagina = iPagina;
+		}
+	}
+	public class ProccesoCargado{
+		public int iError;
+		public int iIDProceso;
+		public Vector<Integer> vecMarcosMemoriaAsignados;
+		public Vector<InfoSwap> vecInfoSwap;
+		public int iPagefaults;
+
+		ProccesoCargado(int iError){
+			this.iError = iError;
+		}
+		ProccesoCargado(int iIDProceso, int iPagefaults, Vector<Integer> vecMarcosMemoriaAsignados){
+			this.iError = 0;
+			this.iIDProceso = iIDProceso;
+			this.iPagefaults = iPagefaults;
+			this.vecMarcosMemoriaAsignados = vecMarcosMemoriaAsignados;
+		}
+		ProccesoCargado(int iIDProceso, int iPagefaults, Vector<Integer> vecMarcosMemoriaAsignados, Vector<InfoSwap> vecInfoSwap){
+			this.iError = 0;
+			this.iIDProceso = iIDProceso;
+			this.iPagefaults = iPagefaults;
+			this.vecMarcosMemoriaAsignados = vecMarcosMemoriaAsignados;
+			this.vecInfoSwap = vecInfoSwap;
 		}
 	}
 }
