@@ -28,7 +28,9 @@ public class ManejadorDeMemoria {
 		this.iTamPagina = iTamPagina;
 		iMarcosMemoria = iTamMemoria/iTamPagina;
 		iMarcosSwap = iTamSwap/iTamPagina;
-
+		
+		hsmTablasDePaginacion = new HashMap<Integer, TablaDePaginacion>();
+		
 		mdpMemoria = new MarcoDePagina[iMarcosMemoria];
 		mdpSwap = new MarcoDePagina[iMarcosSwap];
 	}

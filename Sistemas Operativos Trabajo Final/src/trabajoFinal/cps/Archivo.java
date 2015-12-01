@@ -83,9 +83,11 @@ public class Archivo {
 			iValores[2] = -1;
 
 			try {
-				for (int iK = 0; iK < tokEntrada.countTokens() - 1; iK++) {
+				int iCantTokens = tokEntrada.countTokens();
+				for (int iK = 0; iK < iCantTokens; iK++) {
 					iValores[iK] = Integer.parseInt( tokEntrada.nextToken().trim() );
-				}
+				}								
+												
 			} catch (NumberFormatException e) { // Manejar errores al leer datos
 				bError = true;
 				sMensajeError = sMensajeError + "Alguno de los datos de la instruccion se encuentra mal escrito.\n";
@@ -93,7 +95,7 @@ public class Archivo {
 
 			if ( !bError ) {
 				Instruccion insAAgregar = new Instruccion(sDefinidor, iValores[0], iValores[1], iValores[2]);
-
+				
 				if ( insAAgregar.esInstruccionValida() ) {
 					insAAgregar.setInstruccion(sInstruccion);
 					this.vecInstrucciones.addElement(insAAgregar);
@@ -124,7 +126,7 @@ public class Archivo {
 		int iValor3;	// Valor 3 (en caso de necesitarse para la instrucciÃ³n)
 		int iCantValDisp;	// Cantidad de valores disponibles. Depende del tipo de instrucciÃ³n.
 		boolean bInstruccionValida;	// Indica si la instrucciÃ³n es vÃ¡lida o no
-		String sInstruccion;	// Versión string de la instrucción
+		String sInstruccion;	// Versiï¿½n string de la instrucciï¿½n
 
 		/*
 		 * Instruccion
@@ -144,7 +146,7 @@ public class Archivo {
 			this.iValor1 = iVal1;
 			this.iValor2 = iVal2;
 			this.iValor3 = iVal3;
-
+																	
 			// Verificar que la instrucciÃ³n sea vÃ¡lida y designar cuÃ¡ntos valores se pueden usar
 			if (sTipo.equals("P")) {
 				this.iCantValDisp = 2;
@@ -165,7 +167,7 @@ public class Archivo {
 				bInstruccionValida = false;
 				this.iCantValDisp = -1;
 			}
-
+															
 			// Asignar tipo
 			if ( bInstruccionValida ) {
 				this.sTipo = sTipo;
@@ -194,7 +196,7 @@ public class Archivo {
 		}
 
 		public int getValor2() {
-			if (iCantValDisp > 1) {
+			if (iCantValDisp > 1) {			
 				return this.iValor2;
 			}
 			else {
@@ -212,12 +214,12 @@ public class Archivo {
 		}
 		
 		/**
-		 * Set Instrucción
+		 * Set Instrucciï¿½n
 		 * 
-		 * Método set de la instrucción.
-		 * Atención: tan solo es para poder referencias la instrucción después.
+		 * Mï¿½todo set de la instrucciï¿½n.
+		 * Atenciï¿½n: tan solo es para poder referencias la instrucciï¿½n despuï¿½s.
 		 * 
-		 * @param sInstruccion es la instrucción <code>String</code> utilizada
+		 * @param sInstruccion es la instrucciï¿½n <code>String</code> utilizada
 		 */
 		public void setInstruccion( String sInstruccion ) {
 			this.sInstruccion = new String(sInstruccion);

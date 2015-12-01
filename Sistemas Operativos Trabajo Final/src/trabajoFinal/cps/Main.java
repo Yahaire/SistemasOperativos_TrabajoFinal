@@ -40,7 +40,7 @@ public class Main {
 					bfrArchivoEntrada = new BufferedReader( new FileReader(sRespuesta));
 				
 					String sEntrada;	// Guarda la linea completa del archivo
-					int iContLinea = 0;	// Cuenta la línea de datos que se está leyendo
+					int iContLinea = 0;	// Cuenta la lï¿½nea de datos que se estï¿½ leyendo
 					
 					while ( (sEntrada = bfrArchivoEntrada.readLine()) != null ) {
 						
@@ -58,7 +58,7 @@ public class Main {
 					bfrArchivoEntrada.close();
 					
 					// Procesar instrucciones						
-					if (arcEntrada.vecInstrucciones.size() > 0) {	// Conseguir la primera instrucción
+					if (arcEntrada.vecInstrucciones.size() > 0) {	// Conseguir la primera instrucciï¿½n
 						int iContInstruccion = 0;
 						Archivo.Instruccion insActual;
 						
@@ -69,20 +69,21 @@ public class Main {
 								&& !(insActual.sTipo.equals("E")) 
 								) {
 							ManejadorDeMemoria mdmSistemaOperativo = new ManejadorDeMemoria( 2048, 4096, 8 );
-							HashMap<Integer, Long> hsmTurnarounds = new HashMap<Integer, Long>();	// Contendrá los tiempos de turnaround de cada uno de los procesos (última vez que el proceso se cargó)
+							HashMap<Integer, Long> hsmTurnarounds = new HashMap<Integer, Long>();	// Contendrï¿½ los tiempos de turnaround de cada uno de los procesos (ï¿½ltima vez que el proceso se cargï¿½)
 							
 							
-							// Continuar hasta que se indique fin de sección de instrucciones
+							// Continuar hasta que se indique fin de secciï¿½n de instrucciones
 							while ( !(insActual.sTipo.equals("F")) ) {
 								System.out.println( insActual.getInstruccion() );	// Mostrar instrucciones diferentes de F y E
 								
 								if ( insActual.sTipo.equals("P") ) {	// Cargar proceso
+																	System.out.println(insActual.getValor2());
 									System.out.println("Asignar " + insActual.iValor1 + " bytes al proceso " + insActual.iValor2);
 									
 									ManejadorDeMemoria.ProccesoCargado cajaTemporal = mdmSistemaOperativo.cargarProceso(insActual.iValor1, insActual.iValor2);
 									
 									switch (cajaTemporal.iError) {
-										case 0:	// Se cargó el programa correctamente
+										case 0:	// Se cargï¿½ el programa correctamente
 											hsmTurnarounds.put(insActual.iValor1, System.currentTimeMillis());	// Iniciar contador de turnaround del proceso
 											
 											for (ManejadorDeMemoria.InfoSwap infSwap: cajaTemporal.vecInfoSwap) {	// Mostrar outputs si hubo swaps
@@ -97,10 +98,10 @@ public class Main {
 												System.out.print( iMarcoAsignado + ", ");
 											}
 											break;
-										case 1:	// Error. El proceso es más grande que la memoria 
+										case 1:	// Error. El proceso es mï¿½s grande que la memoria 
 											System.out.println("No fue posible cargar el proceso. El proceso que se intenta cargar es mas grande que la memoria.");
 											break;
-										case 2:	// Error. El proceso ya está cargado
+										case 2:	// Error. El proceso ya estï¿½ cargado
 											System.out.println("No fue posible cargar el proceso. Ya hay un proceso con el mismo ID.");
 											break;
 										case 3:	// Error. Ya no hay espacio suficiente para cargar el programa (Swap llena)
@@ -112,9 +113,9 @@ public class Main {
 								}
 								
 								else if ( insActual.sTipo.equals("A") ) {	// Accesar a proceso para leer o modificar
-									System.out.print("Obtener la dirección real correspondiente a la dirección virtual " + insActual.iValor1
+									System.out.print("Obtener la direcciï¿½n real correspondiente a la direcciï¿½n virtual " + insActual.iValor1
 														+ "del proceso " + insActual.iValor2);
-									if (insActual.iValor3 > 0) { // se busca modificar la línea
+									if (insActual.iValor3 > 0) { // se busca modificar la lï¿½nea
 										System.out.print(" y modificar dicha direccion");
 									}
 									System.out.println(".");
@@ -123,9 +124,9 @@ public class Main {
 									ManejadorDeMemoria.MarcoAccesado cajaTemporal = mdmSistemaOperativo.accesarProceso(insActual.iValor1, insActual.iValor2, bModificar);
 									
 									switch (cajaTemporal.iError) {
-										case 0:	// Se accesó el programa correctamente
-											if ( cajaTemporal.bPagefault ) { // Se tuvo que cargar página a memoria
-												if ( cajaTemporal.bSwapOut ) {	// Fue necersario el hacer un swap para cargar la página a memoria
+										case 0:	// Se accesï¿½ el programa correctamente
+											if ( cajaTemporal.bPagefault ) { // Se tuvo que cargar pï¿½gina a memoria
+												if ( cajaTemporal.bSwapOut ) {	// Fue necersario el hacer un swap para cargar la pï¿½gina a memoria
 													System.out.println(
 															"Pagina " + cajaTemporal.iPaginaSwapOut
 															+ " del proceso " + cajaTemporal.iIDProcesoSwapOut
@@ -133,7 +134,7 @@ public class Main {
 															);
 												}
 												
-												System.out.print(	// Decir dónde quedó cargado el proceso
+												System.out.print(	// Decir dï¿½nde quedï¿½ cargado el proceso
 														"Se localizo la pagina " + cajaTemporal.iPagina
 														+ "del proceso " + cajaTemporal.iIDProcesoSwapIn
 														+ " que estaba en la posicion " + cajaTemporal.iMarcoDeSwapParaSwapIn
@@ -149,10 +150,10 @@ public class Main {
 													"Direccion virtual: " + insActual.iValor1
 													+ "\tDireccion real: " + cajaTemporal.iMarcoDeMemoria);
 											break;
-										case 1:	// Error. El proceso es más grande que la memoria 
+										case 1:	// Error. El proceso es mï¿½s grande que la memoria 
 											System.out.println("No fue posible cargar el proceso. El proceso que se intenta cargar es mas grande que la memoria.");
 											break;
-										case 2:	// Error. El proceso ya está cargado
+										case 2:	// Error. El proceso ya estï¿½ cargado
 											System.out.println("No fue posible cargar el proceso. Ya hay un proceso con el mismo ID.");
 											break;
 										case 3:	// Error. Ya no hay espacio suficiente para cargar el programa (Swap llena)
@@ -170,23 +171,26 @@ public class Main {
 										hsmTurnarounds.put(insActual.iValor1, System.currentTimeMillis() - hsmTurnarounds.get(insActual.iValor1));	// Calcular turnaround time
 										
 										// Mostrar resultados de librerar Memoria
-										System.out.print("Se liberan los marcos de página de memoria real: ");
+										System.out.print("Se liberan los marcos de pï¿½gina de memoria real: ");
 										for (Integer iVal: cajaTemporal.vecMemoria) {
 											System.out.print(iVal + ", ");
 										}
 										System.out.println();
 										
 										// Mostrar resultados de liberar Swap
-										System.out.print("Se liberan las posiciones del área de swapping: ");
+										System.out.print("Se liberan las posiciones del ï¿½rea de swapping: ");
 										for (Integer iVal: cajaTemporal.vecSwap) {
 											System.out.print(iVal + ", ");
 										}
 										System.out.println();
 									}
-									else {	// Error. El proceso no existía en memoria.
-										System.out.println("El proceso que se intentó liberar no se encontraba en memoria.");
+									else {	// Error. El proceso no existï¿½a en memoria.
+										System.out.println("El proceso que se intentï¿½ liberar no se encontraba en memoria.");
 									}
 								}
+								
+								iContInstruccion++;
+								insActual = arcEntrada.vecInstrucciones.get(iContInstruccion);
 							}
 							
 							// Calcular turnaround times restantes
@@ -203,7 +207,7 @@ public class Main {
 							dTurnaroundPromedio /= (double) hsmTurnarounds.size();
 							
 							// Reporte de salida ("F")
-							System.out.println( insActual.getInstruccion() );	// Mostrar instrucción F
+							System.out.println( insActual.getInstruccion() );	// Mostrar instrucciï¿½n F
 							System.out.println("Fin.");
 							for (Integer iIDProceso: veciIDProcesosALiberar) {	// Turnaround por proceso
 								System.out.println( 
@@ -215,18 +219,18 @@ public class Main {
 						}
 						
 						// Mostrar salidas finales
-						System.out.println(insActual.getInstruccion());	// Mostrar la instrucción se espera sea E
+						System.out.println(insActual.getInstruccion());	// Mostrar la instrucciï¿½n se espera sea E
 						
-						if (iContInstruccion < arcEntrada.vecInstrucciones.size()) { // Se terminó el programa con un E y quedaban instrucciones después 
-							System.out.println("Fin del programa. Se detectaron instrucciones después de E, pero no se ejecutaron.");
+						if (iContInstruccion < arcEntrada.vecInstrucciones.size()) { // Se terminï¿½ el programa con un E y quedaban instrucciones despuï¿½s 
+							System.out.println("Fin del programa. Se detectaron instrucciones despuï¿½s de E, pero no se ejecutaron.");
 						}
 						else if (insActual.sTipo.equals("E")) {
 							System.out.println("Fin del programa.");
 						}
-						else {	// El programa terminó de leer las instrucciones, pero no había E
-							System.out.println("Fin del programa. No se encontró la instrucción E para terminar su programa.");
+						else {	// El programa terminï¿½ de leer las instrucciones, pero no habï¿½a E
+							System.out.println("Fin del programa. No se encontrï¿½ la instrucciï¿½n E para terminar su programa.");
 						}
-						System.out.println( insActual.getInstruccion() );	// Mostrar instrucción E
+						System.out.println( insActual.getInstruccion() );	// Mostrar instrucciï¿½n E
 					}
 					else {	// Error. No hay instrucciones
 						System.out.println("El archivo provisto no contiene instrucciones.");
@@ -241,7 +245,7 @@ public class Main {
 						try {	
 							bfrArchivoEntrada.close();	
 						} catch (IOException e) {	
-							System.out.println("Ocurrió un error inesperado al intentar cerrar el documento.");	
+							System.out.println("Ocurriï¿½ un error inesperado al intentar cerrar el documento.");	
 						}
 					}
 				}
