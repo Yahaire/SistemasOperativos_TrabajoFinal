@@ -12,7 +12,7 @@ public class Archivo {
 	private String sNombre;			// nombre del archivo
 	public Vector<Instruccion> vecInstrucciones;
 
-	/*
+	/**
 	 * Archivo
 	 *
 	 * Constructor default
@@ -22,7 +22,7 @@ public class Archivo {
 		vecInstrucciones = new Vector<Instruccion>();
 	}
 
-	/*
+	/**
 	 * Archivo (2)
 	 *
 	 * Constructor con nombre
@@ -34,7 +34,7 @@ public class Archivo {
 		vecInstrucciones = new Vector<Instruccion>();
 	}
 
-	/*
+	/**
 	 * setNombre
 	 *
 	 * Set de sNombre
@@ -45,7 +45,7 @@ public class Archivo {
 		this.sNombre = sNombre;
 	}
 
-	/*
+	/**
 	 * getNombre
 	 *
 	 * Get de sNombre
@@ -56,7 +56,7 @@ public class Archivo {
 		return this.sNombre;
 	}
 
-	/*
+	/**
 	 * Agregar Instruccion
 	 *
 	 * Añade una instrucción nueva.
@@ -67,7 +67,7 @@ public class Archivo {
 	 *
 	 * @return el mensaje <code>String</code> del error encontrado, si es que hay
 	 */
-	public String AgregarInstruccion( String sInstruccion, int iLinea ) {	//%m
+	public String AgregarInstruccion( String sInstruccion, int iLinea ) {	
 		String sMensajeError = "No se ha podido agregar la línea " + iLinea + ". ";
 		boolean bError = false;
 
@@ -126,9 +126,9 @@ public class Archivo {
 		int iValor3;	// Valor 3 (en caso de necesitarse para la instrucción)
 		int iCantValDisp;	// Cantidad de valores disponibles. Depende del tipo de instrucción.
 		boolean bInstruccionValida;	// Indica si la instrucción es válida o no
-		String sInstruccion;	// Versi�n string de la instrucci�n
+		String sInstruccion;	// Versión string de la instrucción
 
-		/*
+		/**
 		 * Instruccion
 		 *
 		 * Constructor parametrizado de la subclase. Se necesitan valor para todos los parámetros. En caso
@@ -177,7 +177,7 @@ public class Archivo {
 			}
 		}
 
-		/*
+		/**
 		 * Es Instrucción Válida
 		 *
 		 * Regresa si la instrucción es válida
@@ -214,12 +214,12 @@ public class Archivo {
 		}
 		
 		/**
-		 * Set Instrucci�n
+		 * Set Instrucción
 		 * 
-		 * M�todo set de la instrucci�n.
-		 * Atenci�n: tan solo es para poder referencias la instrucci�n despu�s.
+		 * Método set de la instrucción.
+		 * Atención: tan solo es para poder referencias la instrucción después.
 		 * 
-		 * @param sInstruccion es la instrucci�n <code>String</code> utilizada
+		 * @param sInstruccion es la instrucción <code>String</code> utilizada
 		 */
 		public void setInstruccion( String sInstruccion ) {
 			this.sInstruccion = new String(sInstruccion);

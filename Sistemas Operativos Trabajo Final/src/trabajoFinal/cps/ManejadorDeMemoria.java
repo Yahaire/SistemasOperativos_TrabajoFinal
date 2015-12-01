@@ -18,9 +18,9 @@ public class ManejadorDeMemoria {
 	/**
 	 * Inicializa los arreglos de objetos MarcoDePagina de memoria y de swap.
 	 *
-	 * @param int iTamMemoria es el tamaño total en bytes de la memoria del simulador.
-	 * @param int iTamMSap es el tamaño total en bytes del swap del simulador.
-	 * @param int iTamPagina es el tamaño bytes de los marcos de pagina del simulador.
+	 * @param iTamMemoria es el tamaño total en bytes de la memoria del simulador.
+	 * @param iTamSwap es el tamaño total en bytes del swap del simulador.
+	 * @param iTamPagina es el tamaño bytes de los marcos de pagina del simulador.
 	 */
 	public ManejadorDeMemoria(int iTamMemoria, int iTamSwap, int iTamPagina){
 		this.iTamMemoria = iTamMemoria;
@@ -28,32 +28,41 @@ public class ManejadorDeMemoria {
 		this.iTamPagina = iTamPagina;
 		iMarcosMemoria = iTamMemoria/iTamPagina;
 		iMarcosSwap = iTamSwap/iTamPagina;
-		
+
 		hsmTablasDePaginacion = new HashMap<Integer, TablaDePaginacion>();
-		
+
 		mdpMemoria = new MarcoDePagina[iMarcosMemoria];
+		for (int iK = 0; iK < iTamMemoria/iTamPagina; iK++) {
+			mdpMemoria[iK] = new MarcoDePagina();
+		}
+
 		mdpSwap = new MarcoDePagina[iMarcosSwap];
+		for (int iK = 0; iK < iTamSwap/iTamPagina; iK++) {
+			mdpSwap[iK] = new MarcoDePagina();
+		}
 	}
 	/**
 	 * Carga el proceso a Memoria. Carga el proceso agregando una
 	 * TablaDePaginacion a hsmTablasDePaginacion en la posicion iIDProceso.
 	 *
-	 * @param int iIDProceso es el ID del prcoceso a cargar.
-	 * @param int iTam es el tamaño en bytes del programa a cargar.
+	 * @param iIDProceso es el ID del prcoceso a cargar.
+	 * @param iTam es el tamaño en bytes del programa a cargar.
 	 *
 	 * TODO: Corregir return
-	 * @return bool Regresa si el programa se pudo cargar o no.
+	 * @return Regresa si el programa se pudo cargar o no.
 	 */
-	public ProccesoCargado cargarProceso(int iIDProceso, int iTam){
+	public ProcesoCargado cargarProceso(int iIDProceso, int iTam){
 		Vector <Pagina> vecPaginas;
 		if(iTam > iTamMemoria){
-			return new ProccesoCargado(1);
+			return new ProcesoCargado(1);
 		}
 		if(hsmTablasDePaginacion.containsKey(iIDProceso)){
-			return new ProccesoCargado(2);
+			return new ProcesoCargado(2);
 		}
 
 		int iPaginasRequeridas = iTam/iTamPagina + ((iTam%iTamPagina != 0)?1:0);
+
+		//System.out.println("Paginas requeridas: " + iPaginasRequeridas); //DEBUG
 
 		if(iPaginasRequeridas < memoriaVacia()){//No swapeo
 			Vector<Pagina> vecPaginasNuevoProceso = new Vector<Pagina>();
@@ -66,9 +75,11 @@ public class ManejadorDeMemoria {
 			}
 			hsmTablasDePaginacion.put(iIDProceso, new TablaDePaginacion(iIDProceso, vecPaginasNuevoProceso));
 
-			return new ProccesoCargado(iIDProceso, iPaginasRequeridas, vecMarcosMemoriaAsignados);
+			return new ProcesoCargado(iIDProceso, iPaginasRequeridas, vecMarcosMemoriaAsignados);
 		}else if(iPaginasRequeridas < (memoriaVacia() + swapVacio())){//Si hay swapeo
 			int iPaginasASwapear = iPaginasRequeridas - memoriaVacia();
+
+			//System.out.println("PAginas a swapeoutear: " + iPaginasASwapear); //DEBUG
 
 			Vector<InfoSwap> vecInfoSwap = new Vector<InfoSwap>();
 
@@ -77,16 +88,19 @@ public class ManejadorDeMemoria {
 				int marcoSwapOut = mfu();
 
 				int iMarcoSwap = primerMarcoSwapVacio();
-				TablaDePaginacion hsmTablaDeProccesoSwapeadoOut = hsmTablasDePaginacion.get(mdpMemoria[marcoSwapOut].getiIDProceso());
-				int iPaginaSwap = hsmTablaDeProccesoSwapeadoOut.getPaginaPorDir(marcoSwapOut * iTamPagina);
-				hsmTablaDeProccesoSwapeadoOut.swapOutPagina(marcoSwapOut * iTamPagina, iMarcoSwap * iTamPagina);
-				hsmTablasDePaginacion.replace(mdpMemoria[marcoSwapOut].getiIDProceso(), hsmTablaDeProccesoSwapeadoOut);
+				TablaDePaginacion tablaDeProcesoSwapeadoOut = hsmTablasDePaginacion.get(mdpMemoria[marcoSwapOut].getiIDProceso());
+
+				int iPaginaSwap = mdpMemoria[marcoSwapOut].getiNumPagTabla();
+				tablaDeProcesoSwapeadoOut.swapOutPagina(marcoSwapOut * iTamPagina, iMarcoSwap * iTamPagina);
+				hsmTablasDePaginacion.replace(mdpMemoria[marcoSwapOut].getiIDProceso(), tablaDeProcesoSwapeadoOut);
 
 				mdpSwap[iMarcoSwap] = mdpMemoria[marcoSwapOut];
-				mdpMemoria[marcoSwapOut].cargar(iIDProceso, i);
+				mdpMemoria[marcoSwapOut] = new MarcoDePagina();
 
 				vecInfoSwap.add(new InfoSwap(mdpSwap[iMarcoSwap].getiIDProceso(), marcoSwapOut, iMarcoSwap, iPaginaSwap));
 			}
+
+			//System.out.println("Memoria vaclia despues de swap out: " + memoriaVacia()); //DEBUG
 
 			//Cargar
 			Vector<Pagina> vecPaginasNuevoProceso = new Vector<Pagina>();
@@ -99,9 +113,9 @@ public class ManejadorDeMemoria {
 			}
 			hsmTablasDePaginacion.put(iIDProceso, new TablaDePaginacion(iIDProceso, vecPaginasNuevoProceso));
 
-			return new ProccesoCargado(iIDProceso, iPaginasRequeridas, vecMarcosMemoriaAsignados, vecInfoSwap);
+			return new ProcesoCargado(iIDProceso, iPaginasRequeridas, vecMarcosMemoriaAsignados, vecInfoSwap);
 		}else{//No hay espacio en memoria virtual para cargar el programa
-			return new ProccesoCargado(3);
+			return new ProcesoCargado(3);
 		}
 	}
 
@@ -161,6 +175,13 @@ public class ManejadorDeMemoria {
 		return i;
 	}
 
+	/**
+	 * Most Frequently Used
+	 *
+	 * Enontrar el indice del marco de pagina mas frecuentemente usado
+	 *
+	 * @return el <code>int</code> indice del marco de página mas frecuentemente usado
+	 */
 	private int mfu(){
 		int maxiAcceso = -1;
 		int maxiAccesoNum = -1;
@@ -189,7 +210,7 @@ public class ManejadorDeMemoria {
 	 * @param iIDProceso es el identificador <code>int</code> del proceso
 	 * que accesa a su memoria liberar.
 	 *
-	 * @param iPagina es el numero <code>int</code> de página que se quiere accesar
+	 * @param iDirVirtual es el numero <code>int</code> de la memoria virtual a accesar
 	 *
 	 * @param bModificar es un <code>boolean</code> que indica si se va a
 	 * modificar la página accesada
@@ -198,18 +219,26 @@ public class ManejadorDeMemoria {
 	 * @return <code>int</code> con el estatus del acceso.
 	 * 	0 -> acceso exitoso.
 	 * 	1 -> el programa no está cargado.
-	 * 	2 -> esa página no pertenece a ese procceso.
+	 * 	2 -> esa página no pertenece a ese proceso.
 	 */
-	public MarcoAccesado accesarProceso(int iIDProceso, int iPagina, boolean bModificar){
-		if(!hsmTablasDePaginacion.containsKey(iIDProceso)){// el procceso no se encuentra cargado
+	public MarcoAccesado accesarProceso(int iIDProceso, int iDirVirtual, boolean bModificar){
+		if(!hsmTablasDePaginacion.containsKey(iIDProceso)){// el proceso no se encuentra cargado
 			MarcoAccesado marcoAccesado = new MarcoAccesado();
 			marcoAccesado.iError = 1;
 			return marcoAccesado;
 		}
 
+		//System.out.println("pid: " + iIDProceso); //DEBUG
+		//System.out.println("dir: " + iDirVirtual); //DEBUG
+
 		Vector <Pagina> vecPaginas = hsmTablasDePaginacion.get(iIDProceso).getVecPaginas();
 
-		if(iPagina > vecPaginas.size()){//esa página no pertenece a ese procceso
+		int iOffset = iDirVirtual%iTamPagina;
+		int iPagina = iDirVirtual/iTamPagina;
+
+		//System.out.println("iPagina: " + iPagina); //DEBUG
+
+		if(iPagina > vecPaginas.size()){//esa página no pertenece a ese proceso
 			MarcoAccesado marcoAccesado = new MarcoAccesado();
 			marcoAccesado.iError = 2;
 			return marcoAccesado;
@@ -217,41 +246,51 @@ public class ManejadorDeMemoria {
 
 		Pagina paginaAccesada = vecPaginas.get(iPagina);
 		if(!paginaAccesada.getbSwap()){// la Pagina está en memoria, no hay swaping
+			//System.out.println("la Pagina está en memoria, no hay swaping"); //DEBUG
+
 			int iMarco = paginaAccesada.getDirFisica() / iTamPagina;
 			mdpMemoria[iMarco].acceso();
 
 			MarcoAccesado marcoAccesado = new MarcoAccesado();
-			marcoAccesado.iMarcoDeMemoria = iMarco;
+			marcoAccesado.iDirDeMemoria = iMarco * iTamPagina + iOffset;
+			marcoAccesado.bPagefault = false;
+			TablaDePaginacion tablaDePaginacion = hsmTablasDePaginacion.get(mdpMemoria[iMarco].getiIDProceso());
+			//System.out.println("iDirMemoria: " + marcoAccesado.iDirDeMemoria); //DEBUG
+			marcoAccesado.iPagina =  tablaDePaginacion.getPaginaPorDir(iMarco * iTamPagina);
+
 			return marcoAccesado;
 
-			//TODO: Cambiarla si fue modificada
 		}else{// la Pagina está en swap, hay que hacer swapIn
+		//System.out.println("la Pagina está en swap, hay que hacer swapIn"); //DEBUG
 			if(memoriaVacia() > 1){// si hay espacio en memoria para hacer el swapIn
 				int iMarco = primerMarcoMemoriaVacio();
 				mdpMemoria[iMarco] = new MarcoDePagina(iIDProceso);
 
 				TablaDePaginacion tablaDePaginacion = hsmTablasDePaginacion.get(iIDProceso);
-				tablaDePaginacion.swapInPagina(paginaAccesada.getiDirSwap(), iMarco * 8);
+				tablaDePaginacion.swapInPagina(paginaAccesada.getiDirSwap(), iMarco * iTamPagina);
 				hsmTablasDePaginacion.replace(iIDProceso, tablaDePaginacion);
 
 				MarcoAccesado marcoAccesado = new MarcoAccesado();
-				marcoAccesado.iMarcoDeMemoria = iMarco;
+				marcoAccesado.iDirDeMemoria = iMarco * iTamPagina + iOffset;
 				marcoAccesado.iMarcoDeSwapParaSwapIn = paginaAccesada.getiDirSwap() / iTamPagina;
 				marcoAccesado.iIDProcesoSwapIn = iIDProceso;
+				marcoAccesado.bPagefault = true;
 				return marcoAccesado;
 			}else{// no hay espacio en memoria para hacer el swapIn, hay que hacer swapOut primero
 				MarcoAccesado marcoAccesado = new MarcoAccesado();
 
 				int iMarcoMemoria = mfu();
-				marcoAccesado.iMarcoDeMemoria = iMarcoMemoria;
+				marcoAccesado.iDirDeMemoria = iMarcoMemoria * iTamPagina + iOffset;
 
 				int iMarcoSwap = primerMarcoSwapVacio();
 
 				//Swap Out
-				TablaDePaginacion hsmTablaDeProccesoSwapeadoOut = hsmTablasDePaginacion.get(mdpMemoria[iMarcoMemoria].getiIDProceso());
+				TablaDePaginacion hsmTablaDeProcesoSwapeadoOut = hsmTablasDePaginacion.get(mdpMemoria[iMarcoMemoria].getiIDProceso());
 				marcoAccesado.iPaginaSwapOut = mdpMemoria[iMarcoMemoria].getiNumPagTabla();
-				hsmTablaDeProccesoSwapeadoOut.swapOutPagina(iMarcoMemoria * iTamPagina, iMarcoSwap * iTamPagina);
-				hsmTablasDePaginacion.replace(mdpMemoria[iMarcoMemoria].getiIDProceso(), hsmTablaDeProccesoSwapeadoOut);
+				hsmTablaDeProcesoSwapeadoOut.swapOutPagina(iMarcoMemoria * iTamPagina, iMarcoSwap * iTamPagina);
+				hsmTablasDePaginacion.replace(mdpMemoria[iMarcoMemoria].getiIDProceso(), hsmTablaDeProcesoSwapeadoOut);
+				marcoAccesado.iIDProcesoSwapOut = mdpMemoria[iMarcoMemoria].getiIDProceso();
+				marcoAccesado.iMarcoDeSwapParaSwapOut = iMarcoSwap;
 
 				mdpSwap[iMarcoSwap] = mdpMemoria[marcoAccesado.iPaginaSwapOut];
 
@@ -262,6 +301,8 @@ public class ManejadorDeMemoria {
 				TablaDePaginacion tablaDePaginacion = hsmTablasDePaginacion.get(iIDProceso);
 				tablaDePaginacion.swapInPagina(paginaAccesada.getiDirSwap(), iMarcoMemoria * iTamPagina);
 				hsmTablasDePaginacion.replace(iIDProceso, tablaDePaginacion);
+				marcoAccesado.bPagefault = true;
+				marcoAccesado.bSwapOut = true;
 
 				marcoAccesado.iIDProcesoSwapIn = iIDProceso;
 				return marcoAccesado;
@@ -273,7 +314,7 @@ public class ManejadorDeMemoria {
 	/**
 	 * Liberar Proceso
 	 *
-	 * Liberar un procceso de memoria.
+	 * Liberar un proceso de memoria.
 	 *
 	 * @param iIDProceso es el identificador <code>int</code> del proceso a liberar.
 	 *
@@ -287,13 +328,19 @@ public class ManejadorDeMemoria {
 		if(hsmTablasDePaginacion.containsKey(iIDProceso)){
 			TablaDePaginacion liberarP = hsmTablasDePaginacion.get(iIDProceso);
 
-			Vector<Integer> vecMemoria = liberarP.liberarMemoria();
-			Vector<Integer> vecSwap = liberarP.liberarSwap();
+			Vector<Integer> vecMemoriaDir = liberarP.liberarMemoria();
+			Vector<Integer> vecSwapDir = liberarP.liberarSwap();
 
-			for (int iDirFisica : vecMemoria){
+			Vector<Integer> vecMemoria = new Vector<Integer>();
+			Vector<Integer> vecSwap = new Vector<Integer>();
+
+
+			for (int iDirFisica : vecMemoriaDir){
+				vecMemoria.add(iDirFisica / iTamPagina);
 				mdpMemoria[iDirFisica / iTamPagina] = new MarcoDePagina();
 			}
-			for (int iDirFisica : vecSwap){
+			for (int iDirFisica : vecSwapDir){
+				vecSwap.add(iDirFisica / iTamPagina);
 				mdpSwap[iDirFisica / iTamPagina] = new MarcoDePagina();
 			}
 
@@ -335,7 +382,7 @@ public class ManejadorDeMemoria {
 		public boolean bSwapOut;
 		public int iIDProcesoSwapOut;
 		public int iIDProcesoSwapIn;
-		public int iMarcoDeMemoria;
+		public int iDirDeMemoria;
 		public int iMarcoDeSwapParaSwapIn;
 		public int iMarcoDeSwapParaSwapOut;
 		public int iPagina;
@@ -351,6 +398,11 @@ public class ManejadorDeMemoria {
 		public int iMarcoSwap;
 		public int iPagina;
 
+		/**
+		 * Constructor parametrizado de IndoSwap
+		 *
+		 * @param iIDProceso es el <code>int</code> del identificador del proceso
+		 */
 		InfoSwap(int iIDProceso, int iMarcoDeMemoria, int iMarcoSwap, int iPagina){
 			this.iIDProceso = iIDProceso;
 			this.iMarcoDeMemoria = iMarcoDeMemoria;
@@ -358,28 +410,31 @@ public class ManejadorDeMemoria {
 			this.iPagina = iPagina;
 		}
 	}
-	public class ProccesoCargado{
+	public class ProcesoCargado{
 		public int iError;
 		public int iIDProceso;
 		public Vector<Integer> vecMarcosMemoriaAsignados;
 		public Vector<InfoSwap> vecInfoSwap;
 		public int iPagefaults;
+		public boolean bSwapOut;
 
-		ProccesoCargado(int iError){
+		ProcesoCargado(int iError){
 			this.iError = iError;
 		}
-		ProccesoCargado(int iIDProceso, int iPagefaults, Vector<Integer> vecMarcosMemoriaAsignados){
+		ProcesoCargado(int iIDProceso, int iPagefaults, Vector<Integer> vecMarcosMemoriaAsignados){
 			this.iError = 0;
 			this.iIDProceso = iIDProceso;
 			this.iPagefaults = iPagefaults;
 			this.vecMarcosMemoriaAsignados = vecMarcosMemoriaAsignados;
+			bSwapOut = false;
 		}
-		ProccesoCargado(int iIDProceso, int iPagefaults, Vector<Integer> vecMarcosMemoriaAsignados, Vector<InfoSwap> vecInfoSwap){
+		ProcesoCargado(int iIDProceso, int iPagefaults, Vector<Integer> vecMarcosMemoriaAsignados, Vector<InfoSwap> vecInfoSwap){
 			this.iError = 0;
 			this.iIDProceso = iIDProceso;
 			this.iPagefaults = iPagefaults;
 			this.vecMarcosMemoriaAsignados = vecMarcosMemoriaAsignados;
 			this.vecInfoSwap = vecInfoSwap;
+			bSwapOut = true;
 		}
 	}
 }

@@ -29,10 +29,14 @@ public class TablaDePaginacion {
 	 */
 	public Vector<Integer> liberarMemoria() {
 
-		Vector<Integer> vecLiberar = new Vector<>();
+		Vector<Integer> vecLiberar = new Vector<Integer>();
 
+		//System.out.println("Direcciones de Paginas a liberar"); //DEBUG
 		for (Pagina p : getVecPaginas()) {
-			vecLiberar.addElement(p.getDirFisica());
+			if(!p.getbSwap()){
+				//System.out.println(p.getDirFisica()); //DEBUG
+				vecLiberar.addElement(p.getDirFisica());
+			}
 		}
 
 		return vecLiberar;
@@ -47,49 +51,52 @@ public class TablaDePaginacion {
 	 */
 	public Vector<Integer> liberarSwap() {
 
-		Vector<Integer> vecLiberar = new Vector<>();
+		Vector<Integer> vecLiberar = new Vector<Integer>();
 
 		for (Pagina p : getVecPaginas()) {
-			vecLiberar.addElement(p.iDirSwap);
+			if(p.getbSwap()){
+				//System.out.println(p.getDirFisica()); //DEBUG
+				vecLiberar.addElement(p.iDirSwap);
+			}
 		}
 
 		return vecLiberar;
 	}
 
-		/**
-		 * Llama a la función swapOut() de la Pagina que se encuentra en iDirMem
-		 *
-		 * @param iDirMem Es la dirección en Memoria de la pagina a la que se hara swapOut.
-		 * @param iDirSwap Es la dirección de Swap donde se pondrá la página.
-		 */
-		public void swapOutPagina (int iDirMem, int iDirSwap) {
+	/**
+	 * Llama a la función swapOut() de la Pagina que se encuentra en iDirMem
+	 *
+	 * @param iDirMem Es la dirección en Memoria de la pagina a la que se hara swapOut.
+	 * @param iDirSwap Es la dirección de Swap donde se pondrá la página.
+	 */
+	public void swapOutPagina (int iDirMem, int iDirSwap) {
 
-			for (Pagina p : getVecPaginas()) {
-				if (p.getDirFisica() == iDirMem) {
-					p.swapOut(iDirSwap);
-					break;
-				}
+		for (Pagina p : getVecPaginas()) {
+			if (p.getDirFisica() == iDirMem) {
+				p.swapOut(iDirSwap);
+				break;
 			}
 		}
+	}
 
-		/**
-		 * Llama a la función swapIn() de la Pagina que se encuentra en iDirSwap
-		 *
-		 * @param iDirSwap Es la dirección de Swap de donde se saca la página.
-		 * @param iDirMem Es la dirección en Memoria donde se pondrá la página.
-		 */
-		public void swapInPagina (int iDirSwap, int iDirMem) {
+	/**
+	 * Llama a la función swapIn() de la Pagina que se encuentra en iDirSwap
+	 *
+	 * @param iDirSwap Es la dirección de Swap de donde se saca la página.
+	 * @param iDirMem Es la dirección en Memoria donde se pondrá la página.
+	 */
+	public void swapInPagina (int iDirSwap, int iDirMem) {
 
-			for (Pagina p : getVecPaginas()) {
-				if (p.getiDirSwap() == iDirSwap) {
-					p.swapIn(iDirMem);
-					break;
-				}
+		for (Pagina p : getVecPaginas()) {
+			if (p.getiDirSwap() == iDirSwap) {
+				p.swapIn(iDirMem);
+				break;
 			}
 		}
+	}
 
 
-		/**
+	/**
 	 * Get VecPaginas
 	 *
 	 * Método get de vecPaginas
@@ -97,42 +104,42 @@ public class TablaDePaginacion {
 	 * @return El vector <code>Pagina</code> que contiene la dirección
 		 * de las paginas en las que esta cargado el proceso.
 	 */
-		public Vector <Pagina> getVecPaginas() {
-			return vecPaginas;
-		}
+	public Vector <Pagina> getVecPaginas() {
+		return vecPaginas;
+	}
 
-		/**
-		 * Set VecPaginas
-		 *
-		 * Método set de vecPaginas
-		 *
-		 * @param vecPaginas El vector de paginas que se recibirá.
-		 */
-		public void setVecPaginas(Vector <Pagina> vecPaginas) {
-			this.vecPaginas = vecPaginas;
-		}
+	/**
+	 * Set VecPaginas
+	 *
+	 * Método set de vecPaginas
+	 *
+	 * @param vecPaginas El vector de paginas que se recibirá.
+	 */
+	public void setVecPaginas(Vector <Pagina> vecPaginas) {
+		this.vecPaginas = vecPaginas;
+	}
 
-		/**
+	/**
 	 * Get iIDProceso
 	 *
 	 * Método get de iIDProceso
 	 *
 	 * @return El <code>int</code> que contiene el ID del proceso.
 	 */
-		public int getiIDProceso() {
-			return iIDProceso;
-		}
+	public int getiIDProceso() {
+		return iIDProceso;
+	}
 
-		/**
-		 * Set iIDProceso
-		 *
-		 * Método set de iIDProceso
-		 *
-		 * @param iIDProceso El ID que se le asignará al proceso.
-		 */
-		public void setiIDProceso(int iIDProceso) {
-			this.iIDProceso = iIDProceso;
-		}
+	/**
+	 * Set iIDProceso
+	 *
+	 * Método set de iIDProceso
+	 *
+	 * @param iIDProceso El ID que se le asignará al proceso.
+	 */
+	public void setiIDProceso(int iIDProceso) {
+		this.iIDProceso = iIDProceso;
+	}
 
 	/**
 	 * Get Página por Direccion
